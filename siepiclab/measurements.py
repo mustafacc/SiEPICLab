@@ -56,11 +56,7 @@ class sequence:
         """Execute the routine."""
         settings = self.experiment.GetSettings()  # get the initial state of the experiment
 
-        try:
-            self.instructions()
-        except AttributeError:
-            print('ERR: No sequence is defined in this routine.')
-            return
+        self.instructions()
 
         # reset the experiment state to the initial state
         self.experiment.SetSettings(settings)
