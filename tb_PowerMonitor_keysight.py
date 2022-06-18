@@ -9,17 +9,17 @@ Mustafa Hammood, SiEPIC Kits, 2022
 # %%
 import sys
 sys.path.append(r'C:\Users\user\Documents\siepiclab')
-sys.path.append(r'C:\Users\user\Documents\siepiclab\routines')
+sys.path.append(r'C:\Users\user\Documents\siepiclab\sequences')
 sys.path.append(r'C:\Users\user\Documents\siepiclab\drivers')
 # %%
 import pyvisa as visa
-import siepiclab as silab
+from siepiclab.sequences import testbench_PowerMonitor_keysight
+from siepiclab.drivers import PowerMonitor_keysight
 rm = visa.ResourceManager()
 
 # %% instruments definition
-pm = silab.drivers.PowerMonitor_keysight(rm.get_instrument('mainframe_1550'), chan='1')
+pm = PowerMonitor_keysight(rm.get_instrument('mainframe_1550'), chan='1')
 
 # %% routine definition
-
-routine = silab.routines.testbench_PowerMonitor_keysight(pm)
-routine.execute()
+sequence = testbench_PowerMonitor_keysight(pm)
+sequence.execute()

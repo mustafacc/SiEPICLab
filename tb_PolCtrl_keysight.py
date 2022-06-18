@@ -13,16 +13,17 @@ sys.path.append(r'C:\Users\user\Documents\siepiclab\sequences')
 sys.path.append(r'C:\Users\user\Documents\siepiclab\drivers')
 # %%
 import pyvisa as visa
-import siepiclab as silab
+from siepiclab.sequences import testbench_PolCtrl_keysight
+from siepiclab.drivers import PolCtrl_keysight
 rm = visa.ResourceManager()
 
 # %% instruments definition
-polCtrl = silab.drivers.PolCtrl_keysight(rm.get_instrument('PolCtrl-2'), chan='0')
+polCtrl = PolCtrl_keysight(rm.get_instrument('PolCtrl-2'), chan='0')
 
 # %% routine definition
 paddlePosition = 401
 paddlePositionAll = [123, 456, 789, 876]
 scanrate = 4
-routine = silab.routines.testbench_PolCtrl_keysight(polCtrl, paddlePosition, paddlePositionAll,
-                                                    scanrate)
-routine.execute()
+sequence = testbench_PolCtrl_keysight(polCtrl, paddlePosition, paddlePositionAll,
+                                      scanrate)
+sequence.execute()
