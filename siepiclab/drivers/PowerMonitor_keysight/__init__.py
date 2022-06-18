@@ -62,6 +62,29 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         self.SetPwrUnit(str(state['PwrUnit']), confirm=True)
         self.SetWavl(state['wavl'], confirm=True)
 
+    def GetPwr(self, log=False):
+        """
+        Get the measured power at the optical power meter.
+
+        Parameters
+        ----------
+        log : Boolean, optional
+            Flag to get in log (dBm) or linear (mW). The default is mW.
+
+        Returns
+        -------
+        pwr : float
+            Measured power at the detector (in selected unit).
+
+        """
+        re = self.query(':READ', ':POW?')
+        if log:
+            pwr = 10*np.log10(1e3*float(str(re.strip())))
+            return pwr
+        else:
+            pwr = 1e3*float(str(re.strip()))
+        return pwr
+
     def GetPwrUnit(self):
         """
         Get the unit setting in the instrument.
@@ -148,25 +171,3 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         if confirm:
             return(self.GetWavl())
 
-    def GetPwr(self, log=False):
-        """
-        Get the measured power at the optical power meter.
-
-        Parameters
-        ----------
-        log : Boolean, optional
-            Flag to get in log (dBm) or linear (mW). The default is mW.
-
-        Returns
-        -------
-        pwr : float
-            Measured power at the detector (in selected unit).
-
-        """
-        re = self.query(':READ', ':POW?')
-        if log:
-            pwr = 10*np.log10(1e3*float(str(re.strip())))
-            return pwr
-        else:
-            pwr = 1e3*float(str(re.strip()))
-        return pwr

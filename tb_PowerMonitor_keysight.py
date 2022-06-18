@@ -21,8 +21,6 @@ rm = visa.ResourceManager()
 pm = PowerMonitor_keysight(rm.get_instrument('mainframe_1550'), chan='1')
 
 # %% routine definition
-pwrUnit = '1'
-wavl = 1310e-9
 
-sequence = testbench_PowerMonitor_keysight(pm, pwrUnit, wavl)
+sequence = testbench_PowerMonitor_keysight(pm)
 sequence.execute()

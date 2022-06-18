@@ -40,6 +40,7 @@ class fls_keysight(instruments.instr_VISA):
         currState = instruments.state()
         currState.AddState('output', self.GetOutput())
         currState.AddState('pwr', self.GetPwr())
+        currState.AddState('wavl', self.GetWavl())
         return currState
 
     def SetState(self, state):
@@ -58,6 +59,7 @@ class fls_keysight(instruments.instr_VISA):
         """
         self.SetOutput(state['output'], confirm=True)
         self.SetPwr(state['pwr'], confirm=True)
+        self.SetWavl(state['wavl'], confirm=True)
 
     def GetPwr(self):
         """
@@ -140,7 +142,45 @@ class fls_keysight(instruments.instr_VISA):
             self.write('SOUR', ':POW:STAT 1')
         else:
             self.write('SOUR', ':POW:STAT 0')
+        if wait or confirm:
+            self.wait()
+        if confirm:
+            return(self.GetOutput())
 
+    def GetWavl(self):
+        """
+        Get the laser wavelength.
+
+        Returns
+        -------
+        wavl : float
+            Wavelength of the laser (nm)
+
+        """
+        re = self.query('SOUR', ':WAV?')
+        wavl = float(str(re.strip()))*1e9
+        return wavl
+
+    def SetWavl(self, wavl, confirm=False, wait=False):
+        """
+        Set the laser wavelength.
+
+        Parameters
+        ----------
+        wavl : float
+            Wavelength of the laser (nm)
+        confirm : Boolean, optional
+            Return the instrument reading after the operation.
+            The default is False.
+        wait : Boolean, optional
+            Block program until the query is done. The default is False.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.write('SOUR', ':WAV '+str(wavl)+'NM')
         if wait or confirm:
             self.wait()
         if confirm:
