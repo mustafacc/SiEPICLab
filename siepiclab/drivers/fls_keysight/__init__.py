@@ -69,12 +69,30 @@ class fls_keysight(instruments.instr_VISA):
             Output power of the laser (mW).
 
         """
-        re = self.addr.query('SOUR', ':POW?')
+        re = self.query('SOUR', ':POW?')
         pwr = float(str(re.strip()))*1e3
         return pwr
 
-    def SetPwr(self, state, confirm=False, wait=False):
-        return
+    def SetPwr(self, pwr, confirm=False, wait=False):
+        """
+        Set the output power of the laser.
+
+        Parameters
+        ----------
+        pwr : float
+            Output power of the laser (mW).
+        confirm : Boolean, optional
+            Return the instrument reading after the operation.
+            The default is False.
+        wait : Boolean, optional
+            Block program until the query is done. The default is False.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.write('SOUR', ':POW '+str(pwr)+'mW')
 
     def GetOutput(self):
         """
