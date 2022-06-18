@@ -43,7 +43,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         currState = instruments.state()
         currState.AddState('PwrUnit', self.GetPwrUnit())
         currState.AddState('wavl', self.GetWavl())
-        return self
+        return currState
 
     def SetState(self, state):
         """
@@ -59,7 +59,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         None.
 
         """
-        self.SetPwrUnit(state['PwrUnit'], confirm=True)
+        self.SetPwrUnit(str(state['PwrUnit']), confirm=True)
         self.SetWavl(state['wavl'], confirm=True)
 
     def GetPwrUnit(self):

@@ -13,16 +13,13 @@ sys.path.append(r'C:\Users\user\Documents\siepiclab\sequences')
 sys.path.append(r'C:\Users\user\Documents\siepiclab\drivers')
 # %%
 import pyvisa as visa
-from siepiclab.sequences import testbench_PowerMonitor_keysight
-from siepiclab.drivers import PowerMonitor_keysight
+from siepiclab.sequences import testbench_fls_keysight
+from siepiclab.drivers import fls_keysight
 rm = visa.ResourceManager()
 
 # %% instruments definition
-pm = PowerMonitor_keysight(rm.get_instrument('mainframe_1550'), chan='1')
+fls = fls_keysight(rm.get_instrument('mainframe_1550'), chan='0')
 
 # %% routine definition
-pwrUnit = '1'
-wavl = 1310e-9
-
-sequence = testbench_PowerMonitor_keysight(pm, pwrUnit, wavl)
+sequence = testbench_fls_keysight(fls)
 sequence.execute()

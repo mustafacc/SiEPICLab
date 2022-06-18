@@ -1,7 +1,7 @@
 """
 SiEPIClab measurement routine.
 
-Testbench for the 11896A polarization controller class.
+Testbench for the 81635A Power Monitor class.
 
 Mustafa Hammood, SiEPIC Kits, 2022
 """
@@ -11,8 +11,10 @@ from siepiclab import measurements
 class testbench_PowerMonitor_keysight(measurements.sequence):
     """Testbench measurement routine for the Power Monitor class."""
 
-    def __init__(self, pm):
+    def __init__(self, pm, pwrUnit, wavl):
         self.pm = pm
+        self.pwrUnit = pwrUnit
+        self.wavl = wavl
 
         instruments = [pm]
         self.experiment = measurements.lab_setup(instruments)
@@ -20,23 +22,17 @@ class testbench_PowerMonitor_keysight(measurements.sequence):
     def instructions(self):
         """Sequence of the routine."""
         import time
-        print('Paddle position reading: ' + str(self.polCtrl.GetPaddlePosition()))
-        print('All Paddles position reading: ' + str(self.polCtrl.GetPaddlePositionAll()))
-        print('Scan rate reading: ' + str(self.polCtrl.GetScanRate()))
 
-        print('Setting paddle position to: '+str(self.paddlePosition))
-        result = self.polCtrl.SetPaddlePosition(1, self.paddlePosition, confirm=True)
-        print('Reading paddle position at: '+str(result))
+        print('Power unit reading: ' + str(self.pm.GetPwrUnit()))
+        print('Wavelength reading: ' + str(self.pm.GetWavl()))
 
-        print('Setting all paddle position to: '+str(self.paddlePositionAll))
-        result = self.polCtrl.SetPaddlePositionAll(self.paddlePositionAll, confirm=True)
-        print('Reading all paddle position at: '+str(result))
+        print('Setting power unit to: '+str(self.pwrUnit))
+        result = self.pm.SetPwrUnit(self.pwrUnit, confirm=True)
+        print('Reading power unit at: '+str(result))
 
-        print('Setting scan rate to: '+str(self.scanrate))
-        result = self.polCtrl.SetScanRate(self.scanrate, confirm=True)
-        print('Reading scan rate to: '+str(result))
+        print('Setting wavelength to: '+str(self.wavl))
+        result = self.pm.SetWavl(self.wavl, confirm=True)
+        print('Reading wavelength at: '+str(result))
 
-        self.polCtrl.StartScan()
-        self.polCtrl.StopScan()
         time.sleep(5)
         print("Testbench ran successfully.")

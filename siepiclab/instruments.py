@@ -123,30 +123,3 @@ class instr_VISA(instr):
 
         """
         self.addr.write(cmd1+self.chan+cmd2)
-
-
-class fls_keysight(instr_VISA):
-    """
-    HP-Agilent-Keysight Fixed Laser Source class.
-
-    Includes:
-    """
-
-    def identify(self, slot=True):
-        """
-        Identify the instrument.
-
-        Parameters
-        ----------
-        slot : Boolean, optional
-            Flag if the instrument is a mainframe slot. The default is True.
-
-        Returns
-        -------
-        Instrument identifier (string).
-
-        """
-        if slot:
-            return(self.query('SLOT', ':IDN?').strip())
-        else:
-            return(instr_VISA.identify(self))
