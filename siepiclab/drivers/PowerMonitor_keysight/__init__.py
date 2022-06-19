@@ -85,6 +85,50 @@ class PowerMonitor_keysight(instruments.instr_VISA):
             pwr = 1e3*float(str(re.strip()))
         return pwr
 
+    def GetZeroAll(self):
+        """
+        Get the zero status for the power detector. If error nonzero is returned.
+
+        Returns
+        -------
+        zero : int
+            Zero flag. Must be zero if channels are zeroed correctly.
+
+        """
+        re = self.addr.query('SENS:CHAN:CORR:COLL:ZERO:ALL?')
+        zero = int(re.strip())
+        return zero
+
+    def SetZeroAll(self, verbose=False, wait=True):
+        """
+        Zeros the electrical offsets the power monitor.
+
+        IMPORTASNT: MAKE SURE THAT THE CHANNELS ARE COVERED AND NO SIGNAL IS
+        INPUT TO THE OPTICAL POWER MONITOR! Takes a while to run, grab a popcorn.
+
+        Parameters
+        ----------
+        verbose : TYPE, optional
+            DESCRIPTION. The default is False.
+        wait : TYPE, optional
+            DESCRIPTION. The default is True.
+
+        Returns
+        -------
+        None, unless verbose.
+
+        """
+        self.addr.timeout = 200000  # seconds
+        self.addr.write('SENS:CHAN:CORR:COLL:ZERO:ALL')
+
+        if verbose or wait:
+            self.wait()
+        self.addr.timeout = 2000  # seconds
+        if verbose:
+            # TODO: returns error VI_ERROR_TMO (-1073807339): Timeout expired.
+            # return(self.GetZeroAll())
+            return 0
+
     def GetPwrUnit(self):
         """
         Get the unit setting in the instrument.
@@ -126,7 +170,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         if unit.lower() not in valid_units:
             print("ERR: Not a valid unit. Valid units are 'dBm' and 'mW', as str.")
             return
-        if unit.lower() == 'dBm':
+        if unit.lower() == 'dbm':
             unit = 0
         else:
             unit = 1

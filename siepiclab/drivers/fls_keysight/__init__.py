@@ -40,6 +40,7 @@ class fls_keysight(instruments.instr_VISA):
         currState = instruments.state()
         currState.AddState('output', self.GetOutput())
         currState.AddState('pwr', self.GetPwr())
+        currState.AddState('pwrUnit', self.GetPwrUnit())
         currState.AddState('wavl', self.GetWavl())
         return currState
 
@@ -59,7 +60,60 @@ class fls_keysight(instruments.instr_VISA):
         """
         self.SetOutput(state['output'], verbose=True)
         self.SetPwr(state['pwr'], verbose=True)
+        self.SetPwrUnit(state['pwrUnit'], verbose=True)
         self.SetWavl(state['wavl'], verbose=True)
+
+    def GetPwrUnit(self):
+        """
+        Get the unit setting in the instrument.
+
+        Returns
+        -------
+        unit : String
+            Unit setting of the instrument (mW or dBm).
+
+        """
+        re = self.query('SOUR', ':POW:UNIT?')
+        unit = int(str(re.strip()))
+        if unit == 1:
+            unit = 'mW'
+        else:
+            unit = 'dBm'
+        return unit
+
+    def SetPwrUnit(self, unit='mW', verbose=False, wait=False):
+        """
+        Set the unit setting in the instrument.
+
+        Parameters
+        ----------
+        unit : String, optional
+            The power unit to set. 'dBm' or 'mW'. The defautlt is 'mW'.
+        verbose : Boolean, optional
+            Return the instrument reading after the operation.
+            The default is False.
+        wait : Boolean, optional
+            Block program until the query is done. The default is False.
+
+        Returns
+        -------
+        None.
+
+        """
+        valid_units = ['dbm', 'mw']
+        if unit.lower() not in valid_units:
+            print("ERR: Not a valid unit. Valid units are 'dBm' and 'mW', as str.")
+            return
+        if unit.lower() == 'dbm':
+            unit = 0
+        else:
+            unit = 1
+        self.write('SOUR', ':POW:UNIT '+str(unit))
+
+        if wait or verbose:
+            self.wait()
+        if verbose:
+            return(self.GetPwrUnit())
 
     def GetPwr(self):
         """

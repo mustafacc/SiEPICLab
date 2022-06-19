@@ -26,10 +26,12 @@ class OptimizePolarization(measurements.sequence):
         Default is 1.
     verbose : Boolean, Optional.
         Verbose messages and plots flag. Default is False.
+    visual : Boolean, Optional.
+        Visualization flag. Default is False.
     """
 
     def __init__(self, fls, polCtrl, pm, scantime=15, pwr=1, wavl=1550,
-                 scanrate=1, verbose=False):
+                 scanrate=1, verbose=False, visual=False):
         self.fls = fls
         self.polCtrl = polCtrl
         self.pm = pm
@@ -38,25 +40,28 @@ class OptimizePolarization(measurements.sequence):
         self.wavl = wavl
         self.scanrate = scanrate
         self.verbose = verbose
+        self.visual = visual
         self.instruments = [fls, polCtrl, pm]
         self.experiment = measurements.lab_setup(self.instruments)
 
-    def BootUp(self):
-        """Instruments boot up portion of the sequence."""
-        # set the laser to the desired wavelength.
-        self.fls.SetWavl(self.wavl)
+    def InstrSetting(self):
+        """Instruments setting."""
+        # set the polarization controller scan rate
         self.polCtrl.SetScanRate(self.scanrate)
-        # set the detector to the wavelength
+        # set the detector to the wavelength and units to mW
         self.pm.SetWavl(self.wavl)
-        # set the detector wavelength units to mW
         self.pm.SetPwrUnit('mW')
-        # turn on the laser
-        self.fls.SetOutput(True)
+        # set the wavelength and power of the laser and turn on
+        self.fls.SetWavl(self.wavl)
+        self.fls.SetPwrUnit('dBm')
         self.fls.SetPwr(self.pwr)
+        self.fls.SetPwrUnit('mW')
+        self.fls.SetOutput(True)
 
     def instructions(self):
         """Instructions of the sequence."""
         import time
+        import numpy as np
 
         if self.verbose:
             print('\nIdentifying instruments . . .')
@@ -64,7 +69,7 @@ class OptimizePolarization(measurements.sequence):
                 print(instr.identify())
             print('\nDone identifying instruments.')
 
-        self.BootUp()
+        self.InstrSetting()
 
         samples = []
         pm_data = []
@@ -77,6 +82,19 @@ class OptimizePolarization(measurements.sequence):
             samples.append(self.polCtrl.GetPaddlePositionAll())
             pm_data.append(self.pm.GetPwr())
         self.polCtrl.StopScan()
+        pm_data = 10*np.log10(np.array(pm_data))
 
+        if self.visual:
+            import matplotlib.pyplot as plt
+            plt.figure(figsize=(11, 6))
+            plt.plot(pm_data, '.')
+            plt.xlabel('Sample')
+            plt.ylabel('Power [dBm]')
+            title1 = 'Polarization optimization sweep sequence\n'
+            title2 = f'scanrate = {self.scanrate}, pwr = {10*np.log10(self.pwr)} dBm\n'
+            title3 = f'wavl = {int(self.wavl)} nm, scantime = {self.scantime}'
+
+            plt.title(title1+title2+title3)
+            plt.tight_layout()
         if self.verbose:
             print("\n***Sequence executed successfully.***")

@@ -19,10 +19,10 @@ polCtrl = PolCtrl_keysight(rm.get_instrument('PolCtrl-2'), chan='0')
 pm = PowerMonitor_keysight(rm.get_instrument('mainframe_1550'), chan='1')
 
 # %% routine definition
-wavl = 1550e-9
+wavl = 1310
 scantime = 5
 scanrate = 1
 
 sequence = OptimizePolarization(fls, polCtrl, pm, wavl=wavl, scantime=scantime,
-                                scanrate=scanrate, verbose=True)
+                                scanrate=scanrate, verbose=True, visual=True)
 sequence.execute(verbose=True)
