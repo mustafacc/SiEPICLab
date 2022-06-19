@@ -1,7 +1,7 @@
 """
 SiEPIClab testbench.
 
-Testbench for the 81635A optical power monitor class.
+Testbench for the fixed laser source instrument class.
 
 Mustafa Hammood, SiEPIC Kits, 2022
 """

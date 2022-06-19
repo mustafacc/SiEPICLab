@@ -1,20 +1,20 @@
 """
 SiEPIClab measurement routine.
 
-Testbench for the fixed laser source class.
+Testbench for the tunable laser source class.
 
 Mustafa Hammood, SiEPIC Kits, 2022
 """
 from siepiclab import measurements
 
 
-class testbench_fls_keysight(measurements.sequence):
-    """Testbench measurement sequence for the fixed laser source class."""
+class testbench_tls_keysight(measurements.sequence):
+    """Testbench measurement sequence for the tunable laser source class."""
 
-    def __init__(self, fls):
-        self.fls = fls
+    def __init__(self, tls):
+        self.tls = tls
 
-        instruments = [fls]
+        instruments = [tls]
         self.experiment = measurements.lab_setup(instruments)
 
     def instructions(self):

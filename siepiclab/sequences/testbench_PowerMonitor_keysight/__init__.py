@@ -20,5 +20,6 @@ class testbench_PowerMonitor_keysight(measurements.sequence):
         """Sequence of the routine."""
         print('Power reading: ' + str(self.pm.GetPwr()))
         print('Zeroing the detector, make sure no incident is input!')
+        print('This may take a while . . .')
         self.pm.SetZeroAll(verbose=True)
         print("Testbench ran successfully.")
