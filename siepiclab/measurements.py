@@ -33,7 +33,7 @@ class lab_setup:
             settings.append(instr.GetState())
             if verbose:
                 print('State of: ' + instr.identify())
-                print(instr.GetState().state)
+                print(str(instr.GetState().state)+'\n')
         return settings
 
     def SetSettings(self, settings):

@@ -92,23 +92,25 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         Returns
         -------
         unit : String
-            Unit setting of the instrument.
-                0: dBm
-                1: Watts
+            Unit setting of the instrument (mW or dBm).
 
         """
         re = self.query('SENS', ':POW:UNIT?')
         unit = int(str(re.strip()))
+        if unit == 1:
+            unit = 'mW'
+        else:
+            unit = 'dBm'
         return unit
 
-    def SetPwrUnit(self, unit=1, verbose=False, wait=False):
+    def SetPwrUnit(self, unit='mW', verbose=False, wait=False):
         """
         Set the unit setting in the instrument.
 
         Parameters
         ----------
         unit : String, optional
-            The power unit to set. 0 for dBm, 1 for mW. The defautlt is 1 (mW).
+            The power unit to set. 'dBm' or 'mW'. The defautlt is 'mW'.
         verbose : Boolean, optional
             Return the instrument reading after the operation.
             The default is False.
@@ -120,10 +122,14 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         None.
 
         """
-        valid_units = ['0', '1']
-        if unit not in valid_units:
-            print('ERR: Not a valid unit. Valid units are 0 and 1, as str.')
-
+        valid_units = ['dbm', 'mw']
+        if unit.lower() not in valid_units:
+            print("ERR: Not a valid unit. Valid units are 'dBm' and 'mW', as str.")
+            return
+        if unit.lower() == 'dBm':
+            unit = 0
+        else:
+            unit = 1
         self.write('SENS', ':POW:UNIT '+str(unit))
 
         if wait or verbose:
@@ -151,8 +157,8 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         Parameters
         ----------
-        wavl : float
-            Wavelength to set the instrument at.
+        wavl : int
+            Wavelength to set the instrument at (nm).
         verbose : Boolean, optional
             Return the instrument reading after the operation.
             The default is False.
@@ -164,7 +170,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         None unless verbose is True.
 
         """
-        self.write('SENS', ':POW:WAV '+str(wavl*1e9)+'NM')
+        self.write('SENS', ':POW:WAV '+str(int(wavl))+'NM')
 
         if wait or verbose:
             self.wait()

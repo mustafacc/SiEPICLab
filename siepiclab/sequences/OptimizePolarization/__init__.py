@@ -17,6 +17,8 @@ class OptimizePolarization(measurements.sequence):
 
     scantime : int, Optional.
         Scan time of the polarization controller (seconds). Default is 15 secs.
+    pwr : float, Optional.
+        Power to use for the laser output (mW). Default is 1 mW.
     wavl : int, Optional.
         Wavelength to perform the sequence at (nm). Default is 1550 nm.
     scanrate : int, Optional.
@@ -26,32 +28,43 @@ class OptimizePolarization(measurements.sequence):
         Verbose messages and plots flag. Default is False.
     """
 
-    def __init__(self, fls, polCtrl, pm, scantime=15, wavl=1550, scanrate=1, verbose=False):
+    def __init__(self, fls, polCtrl, pm, scantime=15, pwr=1, wavl=1550,
+                 scanrate=1, verbose=False):
         self.fls = fls
         self.polCtrl = polCtrl
         self.pm = pm
         self.scantime = scantime
+        self.pwr = pwr
         self.wavl = wavl
         self.scanrate = scanrate
         self.verbose = verbose
         self.instruments = [fls, polCtrl, pm]
         self.experiment = measurements.lab_setup(self.instruments)
 
+    def BootUp(self):
+        """Instruments boot up portion of the sequence."""
+        # set the laser to the desired wavelength.
+        self.fls.SetWavl(self.wavl)
+        self.polCtrl.SetScanRate(self.scanrate)
+        # set the detector to the wavelength
+        self.pm.SetWavl(self.wavl)
+        # set the detector wavelength units to mW
+        self.pm.SetPwrUnit('mW')
+        # turn on the laser
+        self.fls.SetOutput(True)
+        self.fls.SetPwr(self.pwr)
+
     def instructions(self):
         """Instructions of the sequence."""
         import time
 
         if self.verbose:
-            print('Identifying instruments . . .')
+            print('\nIdentifying instruments . . .')
             for instr in self.instruments:
                 print(instr.identify())
-            print('Done identifying instruments.')
+            print('\nDone identifying instruments.')
 
-        # set the laser to the desired wavelength.
-        self.fls.SetWavl(self.wavl)
-        self.polCtrl.SetScanRate(self.scanrate)
-        # set the detector to the wavelength
-        # turn on the laser
+        self.BootUp()
 
         samples = []
         pm_data = []
@@ -66,4 +79,4 @@ class OptimizePolarization(measurements.sequence):
         self.polCtrl.StopScan()
 
         if self.verbose:
-            print("Sequence ran successfully.")
+            print("\n***Sequence executed successfully.***")

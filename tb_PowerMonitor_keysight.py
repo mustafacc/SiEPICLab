@@ -15,6 +15,5 @@ rm = visa.ResourceManager()
 pm = PowerMonitor_keysight(rm.get_instrument('mainframe_1550'), chan='1')
 
 # %% routine definition
-
 sequence = testbench_PowerMonitor_keysight(pm)
 sequence.execute(verbose=True)
