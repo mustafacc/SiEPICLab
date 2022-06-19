@@ -18,7 +18,6 @@ class testbench_PowerMonitor_keysight(measurements.sequence):
 
     def instructions(self):
         """Sequence of the routine."""
-        print(self.pm.identify())
         print('Power reading: ' + str(self.pm.GetPwr()))
 
         print("Testbench ran successfully.")

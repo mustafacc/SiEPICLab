@@ -7,12 +7,6 @@ Test setup:
 
 Mustafa Hammood, SiEPIC Kits, 2022
 """
-
-# %%
-import sys
-sys.path.append(r'C:\Users\user\Documents\siepiclab')
-sys.path.append(r'C:\Users\user\Documents\siepiclab\sequences')
-sys.path.append(r'C:\Users\user\Documents\siepiclab\drivers')
 # %%
 import pyvisa as visa
 from siepiclab.sequences import OptimizePolarization
@@ -27,4 +21,4 @@ pm = PowerMonitor_keysight(rm.get_instrument('mainframe_1550'), chan='1')
 # %% routine definition
 
 sequence = OptimizePolarization(fls, polCtrl, pm, scantime=5, verbose=True)
-sequence.execute()
+sequence.execute(verbose=True)

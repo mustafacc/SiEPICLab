@@ -7,7 +7,6 @@ Mustafa Hammood, SiEPIC Kits, 2022
 """
 
 from siepiclab import instruments
-import numpy as np
 
 
 class PolCtrl_keysight(instruments.instr_VISA):
@@ -80,7 +79,7 @@ class PolCtrl_keysight(instruments.instr_VISA):
         None.
 
         """
-        self.addr.write('SCAN:RATE '+np.str(np.int(scanrate)))
+        self.addr.write('SCAN:RATE '+str(int(scanrate)))
         if wait or confirm:
             self.wait()
         if confirm:
@@ -101,7 +100,7 @@ class PolCtrl_keysight(instruments.instr_VISA):
             Paddle position (value from 0 to 999).
 
         """
-        re = self.addr.query('PADD'+np.str(np.int(paddle))+':POS?')
+        re = self.addr.query('PADD'+str(int(paddle))+':POS?')
         position = int(str(re.strip()))
         return position
 
@@ -126,7 +125,7 @@ class PolCtrl_keysight(instruments.instr_VISA):
         None.
 
         """
-        self.addr.write('PADD'+np.str(np.int(paddle)) + ':POS '+np.str(np.int(position)))
+        self.addr.write('PADD'+str(int(paddle)) + ':POS '+str(int(position)))
         if wait or confirm:
             self.wait()
         if confirm:

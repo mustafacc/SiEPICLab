@@ -13,9 +13,14 @@ class lab_setup:
         self.instruments = instruments
         self.settings = self.GetSettings()
 
-    def GetSettings(self):
+    def GetSettings(self, verbose=False):
         """
         Get the settings of all the instruments in the experiment setup.
+
+        Parameters
+        ----------
+        verbose : Boolean, Optional.
+            Verbose messages for debugging. Default is False.
 
         Returns
         -------
@@ -26,6 +31,9 @@ class lab_setup:
         settings = []
         for instr in self.instruments:
             settings.append(instr.GetState())
+            if verbose:
+                print('State of: ' + instr.identify())
+                print(instr.GetState().state)
         return settings
 
     def SetSettings(self, settings):
@@ -52,9 +60,16 @@ class sequence:
     def __init__(self):
         return
 
-    def execute(self):
-        """Execute the routine."""
-        settings = self.experiment.GetSettings()  # get the initial state of the experiment
+    def execute(self, verbose=False):
+        """Execute the routine.
+
+        Parameters
+        ----------
+        verbose : Boolean, Optional.
+            Verbose messages for debugging. Default is False.
+        """
+        # get the initial state of the experiment
+        settings = self.experiment.GetSettings(verbose)
 
         self.instructions()
 

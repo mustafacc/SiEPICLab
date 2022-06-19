@@ -19,5 +19,4 @@ class testbench_fls_keysight(measurements.sequence):
 
     def instructions(self):
         """Sequence of the routine."""
-        print(self.fls.identify())
         print("Testbench ran successfully.")

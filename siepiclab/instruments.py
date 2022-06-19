@@ -4,7 +4,6 @@ SiEPIClab instruments module.
 
 Mustafa Hammood, SiEPIC Kits, 2022
 """
-import numpy as np
 
 
 class instr:

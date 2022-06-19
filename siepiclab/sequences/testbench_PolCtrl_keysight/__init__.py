@@ -22,7 +22,6 @@ class testbench_PolCtrl_keysight(measurements.sequence):
 
     def instructions(self):
         """Instructions of the sequence."""
-        print(self.polCtrl.identify())
         print("Starting scan . . .")
         self.polCtrl.StartScan()
         self.polCtrl.StopScan()
