@@ -38,8 +38,8 @@ class PolCtrl_keysight(instruments.instr_VISA):
         None.
 
         """
-        self.SetPaddlePositionAll(state['PaddlePositionAll'], confirm=True)
-        self.SetScanRate(state['ScanRate'], confirm=True)
+        self.SetPaddlePositionAll(state['PaddlePositionAll'], verbose=True)
+        self.SetScanRate(state['ScanRate'], verbose=True)
 
     def StartScan(self):
         """Start a random polarization scan."""
@@ -65,7 +65,7 @@ class PolCtrl_keysight(instruments.instr_VISA):
         scanrate = int(str(re.strip()))
         return scanrate
 
-    def SetScanRate(self, scanrate, confirm=False, wait=False):
+    def SetScanRate(self, scanrate, verbose=False, wait=False):
         """
         Set the polarization scan rate of the instrument.
 
@@ -80,9 +80,9 @@ class PolCtrl_keysight(instruments.instr_VISA):
 
         """
         self.addr.write('SCAN:RATE '+str(int(scanrate)))
-        if wait or confirm:
+        if wait or verbose:
             self.wait()
-        if confirm:
+        if verbose:
             return(self.GetScanRate())
 
     def GetPaddlePosition(self, paddle=1):
@@ -104,7 +104,7 @@ class PolCtrl_keysight(instruments.instr_VISA):
         position = int(str(re.strip()))
         return position
 
-    def SetPaddlePosition(self, paddle=1, position=500, confirm=False, wait=False):
+    def SetPaddlePosition(self, paddle=1, position=500, verbose=False, wait=False):
         """
         Set the position of an given paddle in the instrument.
 
@@ -114,7 +114,7 @@ class PolCtrl_keysight(instruments.instr_VISA):
             Paddle ID in the instrument. 1,2, and 3 are valid. The default is 1.
         position : int
             Paddle position (value from 0 to 999).
-        confirm : Boolean, optional
+        verbose : Boolean, optional
             Return the instrument reading after the operation.
             The default is False.
         wait : Boolean, optional
@@ -126,9 +126,9 @@ class PolCtrl_keysight(instruments.instr_VISA):
 
         """
         self.addr.write('PADD'+str(int(paddle)) + ':POS '+str(int(position)))
-        if wait or confirm:
+        if wait or verbose:
             self.wait()
-        if confirm:
+        if verbose:
             return(self.GetPaddlePosition(paddle))
 
     def GetPaddlePositionAll(self, numPaddles=4):
@@ -151,7 +151,7 @@ class PolCtrl_keysight(instruments.instr_VISA):
             paddlePositions.append(self.GetPaddlePosition(pad+1))
         return paddlePositions
 
-    def SetPaddlePositionAll(self, positions=[500, 500, 500, 500], confirm=False, wait=False):
+    def SetPaddlePositionAll(self, positions=[500, 500, 500, 500], verbose=False, wait=False):
         """
         Set the paddle positions for all paddles in the instruemnt.
 
@@ -159,7 +159,7 @@ class PolCtrl_keysight(instruments.instr_VISA):
         ----------
         positions : [list], optional
             List of ints of the paddles positions. The default is [500, 500, 500, 500].
-        confirm : Boolean, optional
+        verbose : Boolean, optional
             Return the instrument reading after the operation.
             The default is False.
         wait : Boolean, optional
@@ -172,7 +172,7 @@ class PolCtrl_keysight(instruments.instr_VISA):
         """
         for paddle in range(len(positions)):
             self.SetPaddlePosition(paddle+1, positions[paddle])
-        if wait or confirm:
+        if wait or verbose:
             self.wait()
-        if confirm:
+        if verbose:
             return(self.GetPaddlePositionAll())

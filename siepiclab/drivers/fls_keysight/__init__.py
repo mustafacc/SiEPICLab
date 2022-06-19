@@ -57,9 +57,9 @@ class fls_keysight(instruments.instr_VISA):
         None.
 
         """
-        self.SetOutput(state['output'], confirm=True)
-        self.SetPwr(state['pwr'], confirm=True)
-        self.SetWavl(state['wavl'], confirm=True)
+        self.SetOutput(state['output'], verbose=True)
+        self.SetPwr(state['pwr'], verbose=True)
+        self.SetWavl(state['wavl'], verbose=True)
 
     def GetPwr(self):
         """
@@ -75,7 +75,7 @@ class fls_keysight(instruments.instr_VISA):
         pwr = float(str(re.strip()))*1e3
         return pwr
 
-    def SetPwr(self, pwr, confirm=False, wait=False):
+    def SetPwr(self, pwr, verbose=False, wait=False):
         """
         Set the output power of the laser.
 
@@ -83,7 +83,7 @@ class fls_keysight(instruments.instr_VISA):
         ----------
         pwr : float
             Output power of the laser (mW).
-        confirm : Boolean, optional
+        verbose : Boolean, optional
             Return the instrument reading after the operation.
             The default is False.
         wait : Boolean, optional
@@ -117,7 +117,7 @@ class fls_keysight(instruments.instr_VISA):
             state = False
             return state
 
-    def SetOutput(self, state, confirm=False, wait=False):
+    def SetOutput(self, state, verbose=False, wait=False):
         """
         Set the state of the laser output power (turned on or off).
 
@@ -127,7 +127,7 @@ class fls_keysight(instruments.instr_VISA):
             State of the power output.
                 True: laser is turned on.
                 False: laser is turned off.
-        confirm : Boolean, optional
+        verbose : Boolean, optional
             Return the instrument reading after the operation.
             The default is False.
         wait : Boolean, optional
@@ -142,9 +142,9 @@ class fls_keysight(instruments.instr_VISA):
             self.write('SOUR', ':POW:STAT 1')
         else:
             self.write('SOUR', ':POW:STAT 0')
-        if wait or confirm:
+        if wait or verbose:
             self.wait()
-        if confirm:
+        if verbose:
             return(self.GetOutput())
 
     def GetWavl(self):
@@ -161,7 +161,7 @@ class fls_keysight(instruments.instr_VISA):
         wavl = float(str(re.strip()))*1e9
         return wavl
 
-    def SetWavl(self, wavl, confirm=False, wait=False):
+    def SetWavl(self, wavl, verbose=False, wait=False):
         """
         Set the laser wavelength.
 
@@ -169,7 +169,7 @@ class fls_keysight(instruments.instr_VISA):
         ----------
         wavl : float
             Wavelength of the laser (nm)
-        confirm : Boolean, optional
+        verbose : Boolean, optional
             Return the instrument reading after the operation.
             The default is False.
         wait : Boolean, optional
@@ -181,7 +181,7 @@ class fls_keysight(instruments.instr_VISA):
 
         """
         self.write('SOUR', ':WAV '+str(wavl)+'NM')
-        if wait or confirm:
+        if wait or verbose:
             self.wait()
-        if confirm:
+        if verbose:
             return(self.GetOutput())

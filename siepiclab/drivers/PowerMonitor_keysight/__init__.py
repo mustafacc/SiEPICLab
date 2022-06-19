@@ -59,8 +59,8 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         None.
 
         """
-        self.SetPwrUnit(str(state['PwrUnit']), confirm=True)
-        self.SetWavl(state['wavl'], confirm=True)
+        self.SetPwrUnit(str(state['PwrUnit']), verbose=True)
+        self.SetWavl(state['wavl'], verbose=True)
 
     def GetPwr(self, log=False):
         """
@@ -101,7 +101,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         unit = int(str(re.strip()))
         return unit
 
-    def SetPwrUnit(self, unit=1, confirm=False, wait=False):
+    def SetPwrUnit(self, unit=1, verbose=False, wait=False):
         """
         Set the unit setting in the instrument.
 
@@ -109,7 +109,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         ----------
         unit : String, optional
             The power unit to set. 0 for dBm, 1 for mW. The defautlt is 1 (mW).
-        confirm : Boolean, optional
+        verbose : Boolean, optional
             Return the instrument reading after the operation.
             The default is False.
         wait : Boolean, optional
@@ -126,9 +126,9 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         self.write('SENS', ':POW:UNIT '+str(unit))
 
-        if wait or confirm:
+        if wait or verbose:
             self.wait()
-        if confirm:
+        if verbose:
             return(self.GetPwrUnit())
 
     def GetWavl(self):
@@ -145,7 +145,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         wavl = float(str(re.strip()))
         return wavl
 
-    def SetWavl(self, wavl, confirm=False, wait=False):
+    def SetWavl(self, wavl, verbose=False, wait=False):
         """
         Set the wavelength setting in the instrument.
 
@@ -153,7 +153,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         ----------
         wavl : float
             Wavelength to set the instrument at.
-        confirm : Boolean, optional
+        verbose : Boolean, optional
             Return the instrument reading after the operation.
             The default is False.
         wait : Boolean, optional
@@ -161,13 +161,12 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         Returns
         -------
-        None unless confirm is True.
+        None unless verbose is True.
 
         """
         self.write('SENS', ':POW:WAV '+str(wavl*1e9)+'NM')
 
-        if wait or confirm:
+        if wait or verbose:
             self.wait()
-        if confirm:
+        if verbose:
             return(self.GetWavl())
-

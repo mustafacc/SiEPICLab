@@ -19,6 +19,5 @@ polCtrl = PolCtrl_keysight(rm.get_instrument('PolCtrl-2'), chan='0')
 pm = PowerMonitor_keysight(rm.get_instrument('mainframe_1550'), chan='1')
 
 # %% routine definition
-
 sequence = OptimizePolarization(fls, polCtrl, pm, scantime=5, verbose=True)
 sequence.execute(verbose=True)
