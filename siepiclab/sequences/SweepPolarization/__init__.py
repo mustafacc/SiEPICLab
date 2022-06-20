@@ -1,16 +1,16 @@
 """
 SiEPIClab measurement sequence.
 
-Polarization optimization sequence.
+Polarization sweep sequence.
 
 Mustafa Hammood, SiEPIC Kits, 2022
 """
 from siepiclab import measurements
 
 
-class OptimizePolarization(measurements.sequence):
+class SweepPolarization(measurements.sequence):
     """
-    Polarization optimization sequence.
+    Polarization sweep sequence.
 
     Test setup:
         laser -SMF-> polarization controller -SMF-> ||DUT|| -SMF-> Power Monitor
@@ -24,6 +24,9 @@ class OptimizePolarization(measurements.sequence):
     scanrate : int, Optional.
         Scan rate of the polarization controller (1 = slowest, 8 = fastest).
         Default is 1.
+    optimize : Boolean, Optional.
+        Optimization flag. Sets the polarization controller to maximize transmission.
+        Default is True.
     verbose : Boolean, Optional.
         Verbose messages and plots flag. Default is False.
     visual : Boolean, Optional.
@@ -40,6 +43,7 @@ class OptimizePolarization(measurements.sequence):
         self.pwr = 1
         self.wavl = 1550
         self.scanrate = 1
+        self.optimize = False
         self.verbose = False
         self.visual = False
 
@@ -74,7 +78,7 @@ class OptimizePolarization(measurements.sequence):
         self.InstrSetting()
 
         samples = []
-        pm_data = []
+        pmReadOut = []
         if self.verbose:
             print("Starting scan . . .")
         self.polCtrl.StartScan()
@@ -82,14 +86,26 @@ class OptimizePolarization(measurements.sequence):
 
         while time.monotonic() < timeStop:
             samples.append(self.polCtrl.GetPaddlePositionAll())
-            pm_data.append(self.pm.GetPwr())
+            pmReadOut.append(self.pm.GetPwr())
         self.polCtrl.StopScan()
-        pm_data = 10*np.log10(np.array(pm_data))
+        pmReadOut = np.array(pmReadOut)
+        pmReadOut = 10*np.log10(pmReadOut)
+        pmReadOut = pmReadOut[np.logical_not(np.isnan(pmReadOut))]  # remove nan
+
+        # TODO: change this to optimize for an input fom and not just T
+        if self.optimize:
+            if self.verbose:
+                print("Optimizing polarizaition . . .")
+            maxT = np.max(pmReadOut)  # maximum transmission
+            idx = np.where(pmReadOut == maxT)[0]
+            self.polCtrl.SetPaddlePositionAll(samples[idx[0]])
 
         if self.visual:
             import matplotlib.pyplot as plt
             plt.figure(figsize=(11, 6))
-            plt.plot(pm_data, '.')
+            plt.plot(pmReadOut, '.')
+            if self.optimize:
+                plt.plot(idx, 10*np.log10(self.pm.GetPwr()), 'x')
             plt.xlabel('Sample')
             plt.ylabel('Power [dBm]')
             title1 = 'Polarization optimization sweep sequence\n'
