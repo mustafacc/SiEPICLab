@@ -30,17 +30,19 @@ class OptimizePolarization(measurements.sequence):
         Visualization flag. Default is False.
     """
 
-    def __init__(self, fls, polCtrl, pm, scantime=15, pwr=1, wavl=1550,
-                 scanrate=1, verbose=False, visual=False):
+    def __init__(self, fls, polCtrl, pm):
         self.fls = fls
         self.polCtrl = polCtrl
         self.pm = pm
-        self.scantime = scantime
-        self.pwr = pwr
-        self.wavl = wavl
-        self.scanrate = scanrate
-        self.verbose = verbose
-        self.visual = visual
+
+        # sequnece default settings
+        self.scantime = 15
+        self.pwr = 1
+        self.wavl = 1550
+        self.scanrate = 1
+        self.verbose = False
+        self.visual = False
+
         self.instruments = [fls, polCtrl, pm]
         self.experiment = measurements.lab_setup(self.instruments)
 

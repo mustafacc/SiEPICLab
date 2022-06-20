@@ -17,7 +17,7 @@ rm = visa.ResourceManager()
 tls = tls_keysight(rm.get_instrument('mainframe_1550'), chan='0')
 pm = PowerMonitor_keysight(rm.get_instrument('mainframe_1550'), chan='1')
 
-# %% routine definition
+# %% sequence definition
 sequence = WavelengthSweep(tls, pm, verbose=True, visual=True)
 sequence.wavlStart = 1280  # nm
 sequence.wavlStop = 1380  # nm

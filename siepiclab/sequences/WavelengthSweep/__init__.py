@@ -21,11 +21,11 @@ class WavelengthSweep(measurements.sequence):
         Visualization flag. Default is False.
     """
 
-    def __init__(self, tls, pm, verbose=False, visual=False):
+    def __init__(self, tls, pm):
         self.tls = tls
         self.pm = pm
 
-        # sweep default settings
+        # sequnece default settings
         self.wavlStart = 1280  # nm
         self.wavlStop = 1380  # nm
         self.wavlPts = 1001  # number of points
@@ -33,8 +33,8 @@ class WavelengthSweep(measurements.sequence):
         self.sweepSpeed = 20  # nm/s
         self.upperLimit = -100  # maximum power expected (dbm, -100: existing setting.)
 
-        self.verbose = verbose
-        self.visual = visual
+        self.verbose = False
+        self.visual = False
         self.instruments = [tls, pm]
         self.experiment = measurements.lab_setup(self.instruments)
 

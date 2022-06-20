@@ -14,6 +14,6 @@ rm = visa.ResourceManager()
 # %% instruments definition
 tls = tls_keysight(rm.get_instrument('mainframe_1550'), chan='0')
 
-# %% routine definition
+# %% sequence definition
 sequence = testbench_tls_keysight(tls)
 sequence.execute(verbose=True)

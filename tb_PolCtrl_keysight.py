@@ -14,6 +14,6 @@ rm = visa.ResourceManager()
 # %% instruments definition
 polCtrl = PolCtrl_keysight(rm.get_instrument('PolCtrl-2'), chan='0')
 
-# %% routine definition
+# %% sequence definition
 sequence = testbench_PolCtrl_keysight(polCtrl)
 sequence.execute(verbose=True)

@@ -38,12 +38,15 @@ class state:
         """
         self.state[parameter] = value
 
+    def GetState(self):
+        """Get the instrument state."""
+        return self.state
+
 
 class instr_VISA(instr):
     """
-    Instrument class.
+    VISA instrument class.
 
-    TODO: docs
     Methods
     -------
     identify
