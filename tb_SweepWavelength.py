@@ -9,7 +9,7 @@ Mustafa Hammood, SiEPIC Kits, 2022
 """
 # %%
 import pyvisa as visa
-from siepiclab.sequences import WavelengthSweep
+from siepiclab.sequences import SweepWavelength
 from siepiclab.drivers import tls_keysight, PowerMonitor_keysight
 rm = visa.ResourceManager()
 
@@ -18,12 +18,14 @@ tls = tls_keysight(rm.get_instrument('mainframe_1550'), chan='0')
 pm = PowerMonitor_keysight(rm.get_instrument('mainframe_1550'), chan='1')
 
 # %% sequence definition
-sequence = WavelengthSweep(tls, pm, verbose=True, visual=True)
+sequence = SweepWavelength(tls, pm)
 sequence.wavlStart = 1280  # nm
 sequence.wavlStop = 1380  # nm
 sequence.wavlPts = 1001  # number of points
 sequence.pwr = 1  # mW
 sequence.sweepSpeed = 20  # nm/s
 sequence.upperLimit = -20  # maximum power expected (dbm, -100: existing setting.)
+sequence.verbose = True
+sequence.visual = True
 
 sequence.execute(verbose=True)

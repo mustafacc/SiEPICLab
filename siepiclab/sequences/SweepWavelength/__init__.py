@@ -1,16 +1,16 @@
 """
 SiEPIClab measurement sequence.
 
-Spectrum sweep sequence using tunable laser source and optical power monitor.
+Wavelength sweep sequence using tunable laser source and optical power monitor.
 
 Mustafa Hammood, SiEPIC Kits, 2022
 """
 from siepiclab import measurements
 
 
-class WavelengthSweep(measurements.sequence):
+class SweepWavelength(measurements.sequence):
     """
-    Wavelength Sweep sequence using tunable laser source and optical power monitor.
+    Wavelength sweep sequence using tunable laser source and optical power monitor.
 
     Test setup:
         laser -SMF-> ||DUT|| -SMF-> Power Monitor(s)
@@ -32,9 +32,9 @@ class WavelengthSweep(measurements.sequence):
         self.pwr = 1  # laser power, mW
         self.sweepSpeed = 20  # nm/s
         self.upperLimit = -100  # maximum power expected (dbm, -100: existing setting.)
-
         self.verbose = False
         self.visual = False
+
         self.instruments = [tls, pm]
         self.experiment = measurements.lab_setup(self.instruments)
 

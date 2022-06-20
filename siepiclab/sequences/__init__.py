@@ -12,4 +12,4 @@ from testbench_PowerMonitor_keysight import testbench_PowerMonitor_keysight
 from testbench_fls_keysight import testbench_fls_keysight
 from testbench_tls_keysight import testbench_tls_keysight
 from SweepPolarization import SweepPolarization
-from WavelengthSweep import WavelengthSweep
+from SweepWavelength import SweepWavelength
