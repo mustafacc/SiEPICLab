@@ -72,18 +72,6 @@ class ldc_srs_ldc500(instruments.instr_VISA):
     def tecOFF(self):
         self.addr.write('TEON OFF')
 
-    def getLDVlimit(self):
-        return(float(self.instrument.query('SVLM?')))
-
-    def setLDVlimit(self, Vlim):  # set voltage limit
-        self.addr.write('SVLM %g' % Vlim)
-
-    def GetLDIlimit(self):
-        return(float(self.instrument.query('SILM?')))
-
-    def SetLDIlimit(self, Ilim):
-        self.addr.write('SILM %g' % Ilim)
-
     def LDON(self):  # turn current on
         self.addr.write('SILD 0')  # set current to 0 first
         self.addr.write('LDON ON')
@@ -93,55 +81,94 @@ class ldc_srs_ldc500(instruments.instr_VISA):
         time.sleep(1)
         self.addr.write('LDON OFF')
 
-    def getLDturnSTATUS(self):
-        res = self.addr.query('LDON?')
-        if float(res) == 1:
-            print('LD is ON')
-            return 1
-        elif float(res) == 0:
-            print('LD is OFF')
-            return 0
+    def GetLDSTATUS(self):
+        re = self.addr.query('LDON?')
+        if float(re) == 1:
+            print('LD is ON.')
+            return True
+        elif float(re) == 0:
+            print('LD is OFF.')
+            return False
 
-    def setLDcurrent(self, Iset):  # current setpoint in mA
-        self.addr.write('SILD %g' % Iset)
+    def GetLDVlim(self):
+        return(float(self.instrument.query('SVLM?')))
 
-    # laser monitor
-    def getLDcurrent(self):  # read current in mA
+    def SetLDVlim(self, Vlim, verbose=False, wait=False):
+        """
+        Set voltage limit for the laser diode.
+
+        Parameters
+        ----------
+        Vlim : float
+            Voltage limit (volts).
+        verbose : Boolean, optional
+            Return the instrument reading after the operation.
+            The default is False.
+        wait : Boolean, optional
+            Block program until the query is done. The default is False.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.addr.write('SVLM %g' % Vlim)
+        if wait or verbose:
+            self.wait()
+        if verbose:
+            return(self.GetLDVlim())
+
+    def GetLDIlim(self):
+        return(float(self.instrument.query('SILM?')))
+
+    def SetLDIlim(self, Ilim, verbose=False, wait=False):
+        self.addr.write('SILM %g' % Ilim)
+        if wait or verbose:
+            self.wait()
+        if verbose:
+            return(self.GetLDIlim())
+
+    def GetLDcurrent(self):  # read current in mA
         res = self.addr.query('RILD?')
         return(float(res))
-#        print('LD current: %g'%float(res))
 
-    def getLDvoltage(self):  # read voltage
+    def SetLDcurrent(self, Iset, verbose=False, wait=False):  # current setpoint in mA
+        self.addr.write('SILD %g' % Iset)
+        if wait or verbose:
+            self.wait()
+        if verbose:
+            return(self.GetLDcurrent())
+
+    def GetLDvoltage(self):  # read voltage
         res = self.addr.query('RVLD?')
         return(float(res))
-#        print('LD voltage: %g'%float(res))
 
     # laser configuration
-    def setLDIrange(self, toggle):  # range
+    def SetLDIrange(self, toggle):  # range
         if toggle == 1:
             self.addr.write('RNGE HIGH')
         elif toggle == 0:
             self.addr.write('RNGE LOW')
         else:
-            print("the range should either be 1 or 0 for high or low")
+            print("ERR: Invalid setting. Options are 1: HIGH, 0: LOW.")
 
-    def getPDcurrentLimit(self):
-        return(float(self.instrument.query('PILM?')))
-
-    def getPDpowerLimit(self):
-        return(float(self.instrument.query('PWLM?')))
-
-    def getPDcurrent(self):
-        return(float(self.instrument.query('RIPD?')))
-
-    def getPDpower(self):
-        return(float(self.instrument.query('RWPD?')))
-
-    def getPDresp(self):
-        return(float(self.instrument.query('RESP?')))
-
-    def getPDbias(self):
+    def GetPDbias(self):
         return(float(self.instrument.query('BIAS?')))
 
-    def setPDbias(self, Vbias):
+    def SetPDbias(self, Vbias):
         self.addr.write('BIAS %g' % float(Vbias))
+
+    def GetPDcurrentLim(self):
+        return(float(self.instrument.query('PILM?')))
+
+    def GetPDpowerLim(self):
+        return(float(self.instrument.query('PWLM?')))
+
+    def GetPDcurrent(self):
+        return(float(self.instrument.query('RIPD?')))
+
+    def GetPDpower(self):
+        return(float(self.instrument.query('RWPD?')))
+
+    def GetPDresp(self):
+        return(float(self.instrument.query('RESP?')))
