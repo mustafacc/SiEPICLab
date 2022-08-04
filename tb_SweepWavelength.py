@@ -10,12 +10,13 @@ Mustafa Hammood, SiEPIC Kits, 2022
 # %%
 import pyvisa as visa
 from siepiclab.sequences import SweepWavelength
-from siepiclab.drivers import tls_keysight, PowerMonitor_keysight
+from siepiclab.drivers.PowerMonitor_keysight import PowerMonitor_keysight
+from siepiclab.drivers.tls_keysight import tls_keysight
 rm = visa.ResourceManager()
 
 # %% instruments definition
-tls = tls_keysight(rm.get_instrument('mainframe_1550'), chan='0')
-pm = PowerMonitor_keysight(rm.get_instrument('mainframe_1550'), chan='1')
+tls = tls_keysight(rm.open_resource('mainframe_1550'), chan='0')
+pm = PowerMonitor_keysight(rm.open_resource('mainframe_1550'), chan='1')
 
 # %% sequence definition
 sequence = SweepWavelength(tls, pm)

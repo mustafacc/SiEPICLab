@@ -7,8 +7,6 @@ Mustafa Hammood, SiEPIC Kits, 2022
 """
 
 from siepiclab import instruments
-from drivers import tls_keysight
-
 
 class tls_keysight(instruments.instr_VISA):
     """
