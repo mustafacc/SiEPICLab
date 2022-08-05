@@ -18,13 +18,13 @@ rm = visa.ResourceManager()
 # %% instruments definition
 mf = lwmm_keysight(rm.open_resource('mainframe_1550'))  # mainframe
 tls = tls_keysight(rm.open_resource('mainframe_1550'), chan='0')
-pm1 = PowerMonitor_keysight(rm.open_resource('mainframe_1550'), chan='2', slot='1')
-pm2 = PowerMonitor_keysight(rm.open_resource('mainframe_1550'), chan='2', slot='2')
+pm1 = PowerMonitor_keysight(rm.open_resource('mainframe_1550'), chan='1', slot='1')
+pm2 = PowerMonitor_keysight(rm.open_resource('mainframe_1550'), chan='1', slot='2')
 # %% sequence definition
 sequence = SweepWavelengthSpectrum(mf, tls, [pm2])
-sequence.wavlStart = 1280  # nm
-sequence.wavlStop = 1370  # nm
-sequence.wavlPts = 401  # number of points
+sequence.wavl_start = 1285  # nm
+sequence.wavl_stop = 1375  # nm
+sequence.wavl_pts = 401  # number of points
 sequence.pwr = 1  # mW
 sequence.sweep_speed = 20  # nm/s
 sequence.upper_limit = -10  # maximum power expected (dbm, -100: existing setting.)

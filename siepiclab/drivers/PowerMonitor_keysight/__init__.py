@@ -341,8 +341,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         """
         if pwr_logging:
             if self.slot is not None:
-                self.addr.write('SENS'+str(self.chan)+':CHAN' +
-                                str(self.slot)+':FUNC:STAT LOGG,STAR')
+                self.addr.write('SENS'+str(self.chan)+':FUNC:STAT LOGG,STAR')
             else:
                 self.write('SENS', ':CHAN'+self.chan+':FUNC:STAT LOGG,STAR')
         else:
@@ -414,10 +413,9 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            re = self.addr.query('SENS'+str(self.chan)+':CHAN' +
-                                 str(self.slot)+':FUNC:PAR:LOGG?')
+            re = self.addr.query('SENS'+str(self.chan)+':FUNC:PAR:LOGG?')
         else:
-            re = self.query('SENS', ':CHAN'+self.chan+':FUNC:PAR:LOGG?')
+            re = self.query('SENS', ':FUNC:PAR:LOGG?')
         pwr_logging_par = str(re.strip()).split(',')
         return (int(pwr_logging_par[0]), float(pwr_logging_par[1]))
 

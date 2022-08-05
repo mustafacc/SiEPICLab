@@ -119,7 +119,10 @@ class SweepWavelengthSpectrum(measurements.sequence):
         # disable power and wavelength logging for power monitor and tunable laser
         for p in self.pm:
             p.SetPwrLogging(False)
+            p.SetAutoRanging(1)
+            p.addr.write('TRIG'+str(p.chan)+':INP IGN')
         self.tls.SetWavlLoggingStatus(False)
+        self.mf.addr.write('TRIG:CONF PASS')
 
         if self.verbose:
             print("\n***Sequence executed successfully.***")
