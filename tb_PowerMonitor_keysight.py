@@ -12,8 +12,9 @@ from siepiclab.drivers.PowerMonitor_keysight import PowerMonitor_keysight
 rm = visa.ResourceManager()
 
 # %% instruments definition
-pm = PowerMonitor_keysight(rm.open_resource('mainframe_1550'), chan='1')
+pm = PowerMonitor_keysight(rm.open_resource('power_monitor'), chan='1')
 
 # %% routine definition
 sequence = testbench_PowerMonitor_keysight(pm)
-sequence.execute(verbose=True)
+sequence.verbose = True
+sequence.execute()
