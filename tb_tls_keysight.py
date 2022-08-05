@@ -16,4 +16,5 @@ tls = tls_keysight(rm.open_resource('mainframe_1550'), chan='0')
 
 # %% sequence definition
 sequence = testbench_tls_keysight(tls)
-sequence.execute(verbose=True)
+sequence.verbose = True
+sequence.execute()

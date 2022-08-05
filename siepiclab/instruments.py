@@ -55,7 +55,7 @@ class instr_VISA(instr):
     write
     """
 
-    def __init__(self, addr, chan):
+    def __init__(self, addr, chan=None):
         self.addr = addr
         self.chan = chan
 
@@ -96,10 +96,10 @@ class instr_VISA(instr):
 
         Parameters
         ----------
-        cmd1 : TYPE
-            DESCRIPTION.
-        cmd2 : TYPE, optional
-            DESCRIPTION. The default is ''.
+        cmd1 : string
+            First command.
+        cmd2 : string, optional
+            second command. The default is ''.
 
         Returns
         -------
@@ -114,14 +114,17 @@ class instr_VISA(instr):
 
         Parameters
         ----------
-        cmd1 : TYPE
-            DESCRIPTION.
-        cmd2 : TYPE, optional
-            DESCRIPTION. The default is ''.
+        cmd1 : string
+            First command.
+        cmd2 : string, optional
+            second command. The default is ''.
 
         Returns
         -------
         None.
 
         """
-        self.addr.write(cmd1+self.chan+cmd2)
+        if self.chan:
+            self.addr.write(cmd1+self.chan+cmd2)
+        else:
+            self.addr.write(cmd1+cmd2)
