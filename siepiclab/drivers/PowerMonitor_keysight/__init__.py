@@ -86,9 +86,9 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            re = self.query(':READ'+str(self.slot)+':CHAN', ':POW?')
+            re = self.addr.query(':FETC'+str(self.chan)+':CHAN'+str(self.slot)+':POW?')
         else:
-            re = self.query(':READ', ':POW?')
+            re = self.query(':FETC', ':POW?')
         if log:
             pwr = 10*np.log10(1e3*float(str(re.strip())))
             return pwr
@@ -106,7 +106,11 @@ class PowerMonitor_keysight(instruments.instr_VISA):
             Zero flag. Must be zero if channels are zeroed correctly.
 
         """
-        re = self.addr.query('SENS:CHAN:CORR:COLL:ZERO:ALL?')
+        if self.slot is not None:
+            re = self.addr.query('SENS'+str(self.chan)+':CHAN' +
+                                 str(self.slot)+':CORR:COLL:ZERO:ALL?')
+        else:
+            re = self.addr.query('SENS:CHAN:CORR:COLL:ZERO:ALL?')
         zero = int(re.strip())
         return zero
 
@@ -130,7 +134,11 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         self.addr.timeout = 200000  # seconds
-        self.addr.write('SENS:CHAN:CORR:COLL:ZERO:ALL')
+        if self.slot is not None:
+            self.addr.write('SENS'+str(self.chan)+':CHAN' +
+                            str(self.slot)+':CORR:COLL:ZERO:ALL')
+        else:
+            self.addr.write('SENS:CHAN:CORR:COLL:ZERO:ALL')
 
         if verbose or wait:
             self.wait()
@@ -151,7 +159,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            re = self.query('SENS'+str(self.slot)+':CHAN', ':POW:UNIT?')
+            re = self.addr.query('SENS'+str(self.chan)+':CHAN'+str(self.slot) + ':POW:UNIT?')
         else:
             re = self.query('SENS', ':POW:UNIT?')
         unit = int(str(re.strip()))
@@ -189,7 +197,8 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         else:
             unit = 1
         if self.slot is not None:
-            self.write('SENS'+str(self.slot)+':CHAN', ':POW:UNIT '+str(unit))
+            self.addr.write('SENS'+str(self.chan)+':CHAN' +
+                            str(self.slot)+':POW:UNIT '+str(unit))
         else:
             self.write('SENS', ':POW:UNIT '+str(unit))
 
@@ -209,7 +218,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            re = self.query('SENS'+str(self.slot)+':CHAN', ':POW:WAV?')
+            re = self.addr.query('SENS'+str(self.chan)+':CHAN'+str(self.slot) + ':POW:WAV?')
         else:
             re = self.query('SENS', ':POW:WAV?')
         wavl = 1e9*float(str(re.strip()))
@@ -235,7 +244,8 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            self.write('SENS'+str(self.slot)+':CHAN', ':POW:WAV '+str(float(wavl))+'NM')
+            self.addr.write('SENS'+str(self.chan)+':CHAN'+str(self.slot) +
+                            ':POW:WAV '+str(float(wavl))+'NM')
         else:
             self.write('SENS', ':POW:WAV '+str(float(wavl))+'NM')
 
@@ -257,7 +267,8 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            re = self.query('SENS'+str(self.slot), ':CHAN'+self.chan+':POW:RANG:AUTO?')
+            re = self.addr.query('SENS'+str(self.chan)+':CHAN' +
+                                 str(self.slot)+':POW:RANG:AUTO?')
         else:
             re = self.query('SENS', ':CHAN'+self.chan+':POW:RANG:AUTO?')
         return int(str(re.strip()))
@@ -284,8 +295,8 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            self.write('SENS'+str(self.slot)+':CHAN', ':CHAN' +
-                       self.chan+':POW:RANG:AUTO '+str(auto_range))
+            self.addr.write('SENS'+str(self.chan)+':CHAN'+str(self.slot) +
+                            ':POW:RANG:AUTO '+str(auto_range))
         else:
             self.write('SENS', ':CHAN'+self.chan+':POW:RANG:AUTO '+str(auto_range))
         if wait or verbose:
@@ -304,7 +315,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            re = self.query('SENS'+str(self.slot), ':CHAN'+self.chan+':FUNC:STAT?')
+            re = self.addr.query('SENS'+str(self.chan)+':CHAN'+str(self.slot)+':FUNC:STAT?')
         else:
             re = self.query('SENS', ':CHAN'+self.chan+':FUNC:STAT?')
         return str(re.strip())
@@ -330,12 +341,14 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         """
         if pwr_logging:
             if self.slot is not None:
-                self.write('SENS'+str(self.slot), ':CHAN'+self.chan+':FUNC:STAT LOGG,STAR')
+                self.addr.write('SENS'+str(self.chan)+':CHAN' +
+                                str(self.slot)+':FUNC:STAT LOGG,STAR')
             else:
                 self.write('SENS', ':CHAN'+self.chan+':FUNC:STAT LOGG,STAR')
         else:
             if self.slot is not None:
-                self.write('SENS'+str(self.slot), ':CHAN'+self.chan+':FUNC:STAT LOGG,STOP')
+                self.addr.write('SENS'+str(self.chan)+':CHAN' +
+                                str(self.slot)+':FUNC:STAT LOGG,STOP')
             else:
                 self.write('SENS', ':CHAN'+self.chan+':FUNC:STAT LOGG,STOP')
         if pwr_logging and wait:
@@ -355,7 +368,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            re = self.query('SENS'+str(self.slot), ':CHAN'+self.chan+':POW:RANG?')
+            re = self.addr.query('SENS'+str(self.chan)+':CHAN'+str(self.slot)+':POW:RANG?')
         else:
             re = self.query('SENS', ':CHAN'+self.chan+':POW:RANG?')
         return float(str(re.strip()))
@@ -380,7 +393,8 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            self.write('SENS'+str(self.slot), ':CHAN'+self.chan+':POW:RANG '+str(power_range))
+            self.addr.write('SENS'+str(self.chan)+':CHAN' +
+                            str(self.slot)+':POW:RANG '+str(power_range))
         else:
             self.write('SENS', ':CHAN'+self.chan+':POW:RANG '+str(power_range))
         if wait or verbose:
@@ -400,7 +414,8 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            re = self.query('SENS'+str(self.slot), ':CHAN'+self.chan+':FUNC:PAR:LOGG?')
+            re = self.addr.query('SENS'+str(self.chan)+':CHAN' +
+                                 str(self.slot)+':FUNC:PAR:LOGG?')
         else:
             re = self.query('SENS', ':CHAN'+self.chan+':FUNC:PAR:LOGG?')
         pwr_logging_par = str(re.strip()).split(',')
@@ -428,8 +443,8 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            self.write('SENS'+str(self.slot), ':CHAN'+self.chan +
-                       ':FUNC:PAR:LOGG ' + str(int(num_pts))+','+str(avg_time))
+            self.addr.write('SENS'+str(self.chan)+':FUNC:PAR:LOGG ' +
+                            str(int(num_pts))+','+str(avg_time))
         else:
             self.write('SENS', ':CHAN'+self.chan+':FUNC:PAR:LOGG ' +
                        str(int(num_pts))+','+str(avg_time))
@@ -454,7 +469,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            cmd = 'SENS'+str(int(self.slot))+':CHAN'+self.chan+':FUNC:RES?'
+            cmd = 'SENS'+str(self.chan)+':CHAN'+str(self.slot)+':FUNC:RES?'
         else:
             cmd = 'SENS:CHAN'+self.chan+':FUNC:RES?'
         return np.array(self.addr.query_binary_values(cmd))

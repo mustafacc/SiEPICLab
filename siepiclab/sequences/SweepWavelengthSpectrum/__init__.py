@@ -34,7 +34,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
         # sequnece default settings
         self.wavl_start = 1280  # nm
         self.wavl_stop = 1370  # nm
-        self.wavl_pts = 1001  # number of points
+        self.wavl_pts = 501  # number of points
         self.pwr = 1  # laser power, mW
         self.sweep_speed = 20  # nm/s
         self.pwr_range = -100  # maximum power expected (dbm, -100: existing setting.)
@@ -46,7 +46,6 @@ class SweepWavelengthSpectrum(measurements.sequence):
         self.sweep_step = (self.wavl_stop-self.wavl_start)/(self.wavl_start-1)
 
         # if user configures only a single power monitor not then make it a list
-
 
     def setup(self):
         """Instruments setting to customizable sequence parameters."""
@@ -68,7 +67,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
         self.mf.addr.write('TRIG:CONF LOOP')
         # set power meters to receive trigger (also check if there are multiple pms)
         for p in self.pm:
-            p.write('TRIG', ':INP SME')
+            p.addr.write('TRIG'+str(p.chan)+':INP SME')
 
         # Configure tunable laser sweep settings
         # sweep mode, cycle number, start wavl, stop wavl, sweep speed, and step

@@ -31,3 +31,5 @@ sequence.verbose = True
 sequence.visual = True
 
 sequence.execute(verbose=True)
+
+sequence.results.save()
