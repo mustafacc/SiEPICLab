@@ -43,7 +43,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
         self.experiment = measurements.lab_setup(self.instruments)
 
         self.wavl = int((self.wavl_stop+self.wavl_start)/2)
-        self.sweep_step = (self.wavl_stop-self.wavl_start)/(self.wavl_start-1)
+        self.sweep_step = (self.wavl_stop-self.wavl_start)/(self.wavl_pts-1)
 
         # if user configures only a single power monitor not then make it a list
 
