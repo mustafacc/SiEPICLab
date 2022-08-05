@@ -24,9 +24,7 @@ class SweepIV(measurements.sequence):
 
     def __init__(self, smu):
         self.smu = smu
-        self.v_start = 0
-        self.v_stop = 1
-        self.v_res = 0.1
+        self.v_pts = [0]
         self.chan = 'A'
         self.pwr_lim = 10e-3
 
@@ -42,11 +40,11 @@ class SweepIV(measurements.sequence):
             print('\nDone identifying instruments.')
         self.smu.SetPowerLimit(self.pwr_lim, self.chan)
         self.smu.SetOutput(1, self.chan)
-        v_pts = np.arange(self.v_start, self.v_stop, self.v_res)
+
         volt_arr = []
         curr_arr = []
         res_arr = []
-        for v in v_pts:
+        for v in self.v_pts:
             self.smu.SetVoltage(v, self.chan)
 
             volt_arr.append(self.smu.GetVoltage(self.chan))
@@ -62,6 +60,20 @@ class SweepIV(measurements.sequence):
             plt.plot(volt_arr, 1e3*curr_arr, '.')
             plt.xlabel('Voltage [V]')
             plt.ylabel('Current [mA]')
+            plt.title('Result of IVSweep sequence.')
+            plt.tight_layout()
+
+            plt.figure(figsize=(11, 6))
+            plt.plot(volt_arr, res_arr, '.')
+            plt.xlabel('Voltage [V]')
+            plt.ylabel('Resistance [Ohms]')
+            plt.title('Result of IVSweep sequence.')
+            plt.tight_layout()
+
+            plt.figure(figsize=(11, 6))
+            plt.plot(volt_arr, volt_arr*curr_arr*1e3, '.')
+            plt.xlabel('Voltage [V]')
+            plt.ylabel('Power [mW]')
             plt.title('Result of IVSweep sequence.')
             plt.tight_layout()
         if self.verbose:
