@@ -26,3 +26,5 @@ sequence.chan = 'B'
 sequence.verbose = True
 sequence.visual = True
 sequence.execute()
+
+sequence.results.save()

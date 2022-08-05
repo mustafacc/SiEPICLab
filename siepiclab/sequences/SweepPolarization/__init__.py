@@ -34,6 +34,7 @@ class SweepPolarization(measurements.sequence):
     """
 
     def __init__(self, fls, polCtrl, pm):
+        super(SweepPolarization, self).__init__()
         self.fls = fls
         self.polCtrl = polCtrl
         self.pm = pm
@@ -99,6 +100,9 @@ class SweepPolarization(measurements.sequence):
             maxT = np.max(pmReadOut)  # maximum transmission
             idx = np.where(pmReadOut == maxT)[0]
             self.polCtrl.SetPaddlePositionAll(samples[idx[0]])
+
+        self.results.add('idx', idx)
+        self.results.add('pmReadOut', pmReadOut)
 
         if self.visual:
             import matplotlib.pyplot as plt

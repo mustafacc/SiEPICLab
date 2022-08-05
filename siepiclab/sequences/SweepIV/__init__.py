@@ -23,6 +23,7 @@ class SweepIV(measurements.sequence):
     """
 
     def __init__(self, smu):
+        super(SweepIV, self).__init__()
         self.smu = smu
         self.v_pts = [0]
         self.chan = 'A'
@@ -41,37 +42,42 @@ class SweepIV(measurements.sequence):
         self.smu.SetPowerLimit(self.pwr_lim, self.chan)
         self.smu.SetOutput(1, self.chan)
 
-        volt_arr = []
-        curr_arr = []
-        res_arr = []
+        volt = []
+        curr = []
+        res = []
         for v in self.v_pts:
             self.smu.SetVoltage(v, self.chan)
 
-            volt_arr.append(self.smu.GetVoltage(self.chan))
-            curr_arr.append(self.smu.GetCurrent(self.chan))
-            res_arr.append(self.smu.GetResistance(self.chan))
+            volt.append(self.smu.GetVoltage(self.chan))
+            curr.append(self.smu.GetCurrent(self.chan))
+            res.append(self.smu.GetResistance(self.chan))
 
-        volt_arr = np.array(volt_arr)
-        curr_arr = np.array(curr_arr)
-        res_arr = np.array(res_arr)
+        volt = np.array(volt)
+        curr = np.array(curr)
+        res = np.array(res)
+
+        self.results.add('volt', volt)
+        self.results.add('curr', curr)
+        self.results.add('res', res)
+
         if self.visual:
             import matplotlib.pyplot as plt
             plt.figure(figsize=(11, 6))
-            plt.plot(volt_arr, 1e3*curr_arr, '.')
+            plt.plot(volt, 1e3*curr, '.')
             plt.xlabel('Voltage [V]')
             plt.ylabel('Current [mA]')
             plt.title('Result of IVSweep sequence.')
             plt.tight_layout()
 
             plt.figure(figsize=(11, 6))
-            plt.plot(volt_arr, res_arr, '.')
+            plt.plot(volt, res, '.')
             plt.xlabel('Voltage [V]')
             plt.ylabel('Resistance [Ohms]')
             plt.title('Result of IVSweep sequence.')
             plt.tight_layout()
 
             plt.figure(figsize=(11, 6))
-            plt.plot(volt_arr, volt_arr*curr_arr*1e3, '.')
+            plt.plot(volt, volt*curr*1e3, '.')
             plt.xlabel('Voltage [V]')
             plt.ylabel('Power [mW]')
             plt.title('Result of IVSweep sequence.')

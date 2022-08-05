@@ -4,6 +4,8 @@ SiEPIClab measurements module.
 
 Mustafa Hammood, SiEPIC Kits, 2022
 """
+import pickle
+from datetime import datetime
 
 
 class lab_setup:
@@ -50,12 +52,91 @@ class lab_setup:
             inst.SetState(self.settings[idx].state)
 
 
+class results:
+    """Measurement results abstraction class."""
+
+    def __init__(self):
+        self.data = dict()
+        return
+
+    def add(self, name, data):
+        """
+        Add dataset to the results.
+
+        Example
+        ----------
+            voltage = [1,2,3]
+            current = [1,2,3]
+            results = siepiclab.measurements.results()
+            results.add('voltage', voltage)
+            results.add('current', current)
+
+        Parameters
+        ----------
+        name : string
+            Name of the data to add.
+        data : Any
+            Content of the data.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.data[str(name)] = data
+
+    def save(self, file_name=None, timestamp=False):
+        """
+        Export the results to a pickle file (.pkl).
+
+        Parameters
+        ----------
+        file_name : string, optional
+            File name and directory of the file to save. The default is None.
+                Current timestamp will be used if filename is None.
+        timestamp : Boolean, optional
+            Flag to add a timestamp in the format of YYYYMMDDHHMMSS format.
+
+        Returns
+        -------
+        None.
+
+        """
+        if timestamp or file_name is None:
+            if file_name is None:
+                file_name = str(datetime.now().strftime('%Y%m%d%H%M%S'))
+            else:
+                file_name = str(datetime.now().strftime('%Y%m%d%H%M%S'))+'_'+file_name
+
+        with open(str(file_name)+'.pkl', 'wb') as f:
+            pickle.dump(self.data, f)
+
+    def load(self, file_name):
+        """
+        Import previousily exported results pickle file (.pkl).
+
+        Parameters
+        ----------
+        file_name : string, optional
+            File name and directory of the file to save.
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
+        with open(str(file_name)+'.pkl', 'rb') as f:
+            return pickle.load(f)
+
+
 class sequence:
     """Operations sequence abstraction class."""
 
     def __init__(self, visual=False, verbose=False):
         self.verbose = verbose
         self.visual = visual
+        self.results = results()
         return
 
     def execute(self):
