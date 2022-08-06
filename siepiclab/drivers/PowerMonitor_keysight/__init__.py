@@ -444,7 +444,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
             self.addr.write('SENS'+str(self.chan)+':FUNC:PAR:LOGG ' +
                             str(int(num_pts))+','+str(avg_time))
         else:
-            self.write('SENS', ':CHAN'+self.chan+':FUNC:PAR:LOGG ' +
+            self.write('SENS', ':FUNC:PAR:LOGG ' +
                        str(int(num_pts))+','+str(avg_time))
         if wait or verbose:
             self.wait()

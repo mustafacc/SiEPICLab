@@ -28,24 +28,20 @@ class SweepWavelengthSpectrum(measurements.sequence):
         self.tls = tls
         self.pm = pm
 
+        # if user configures only a single power monitor not then make it a list
         if type(self.pm) != list:
             self.pm = [self.pm]
 
         # sequnece default settings
         self.wavl_start = 1280  # nm
         self.wavl_stop = 1370  # nm
-        self.wavl_pts = 501  # number of points
+        self.wavl_pts = 401  # number of points
         self.pwr = 1  # laser power, mW
         self.sweep_speed = 20  # nm/s
         self.pwr_range = -100  # maximum power expected (dbm, -100: existing setting.)
 
         self.instruments = [mf, tls] + self.pm
         self.experiment = measurements.lab_setup(self.instruments)
-
-        self.wavl = int((self.wavl_stop+self.wavl_start)/2)
-        self.sweep_step = (self.wavl_stop-self.wavl_start)/(self.wavl_pts-1)
-
-        # if user configures only a single power monitor not then make it a list
 
     def setup(self):
         """Instruments setting to customizable sequence parameters."""
@@ -96,6 +92,9 @@ class SweepWavelengthSpectrum(measurements.sequence):
                 print(instr.identify())
             print('\nDone identifying instruments.')
 
+        self.wavl = int((self.wavl_stop+self.wavl_start)/2)
+        self.sweep_step = (self.wavl_stop-self.wavl_start)/(self.wavl_pts-1)
+
         self.setup()
         time_delays = 2.5
         self.tls.SetWavlLoggingStatus(True)
@@ -111,10 +110,10 @@ class SweepWavelengthSpectrum(measurements.sequence):
             time.sleep(time_delays)  # check every half a sec if the sweep is done
 
         # fetch the sweep data from the buffers
-        rslts_wavl = self.tls.GetWavlLoggingData()
+        rslts_wavl = 1e9*self.tls.GetWavlLoggingData()  # nm
         rslts_pwr = np.zeros((rslts_wavl.size, len(self.pm)))
         for n, p in enumerate(self.pm):
-            rslts_pwr[:, n] = p.GetPwrLoggingData()
+            rslts_pwr[:, n] = 1e3*p.GetPwrLoggingData()  # mW
 
         # disable power and wavelength logging for power monitor and tunable laser
         for p in self.pm:
@@ -123,6 +122,17 @@ class SweepWavelengthSpectrum(measurements.sequence):
             p.addr.write('TRIG'+str(p.chan)+':INP IGN')
         self.tls.SetWavlLoggingStatus(False)
         self.mf.addr.write('TRIG:CONF PASS')
+
+        if self.visual:
+            import matplotlib.pyplot as plt
+            plt.figure(figsize=(11, 6))
+            plt.plot(rslts_wavl, 10*np.log10(rslts_pwr))
+            plt.xlim(min(rslts_wavl), max(rslts_wavl))
+            plt.xlabel('Wavelength [nm]')
+            plt.ylabel('Optical Power [dBm]')
+            plt.title(
+                f"Result of Wavelength Spectrum Sweep.\nLaser power: {self.tls.GetPwr()} {self.tls.GetPwrUnit()}")
+            plt.tight_layout()
 
         if self.verbose:
             print("\n***Sequence executed successfully.***")
