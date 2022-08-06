@@ -80,7 +80,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
         for idx, p in enumerate(self.pm):
             p.SetAutoRanging(0)  # disable auto ranging
             p.SetPwrRange(self.upper_limit)
-            p.SetPwrUnit('dBm')
+            p.SetPwrUnit('mW')
             p.SetPwrLoggingPar(self.wavl_pts, 0.5 *
                                self.sweep_step/self.sweep_speed)
 
