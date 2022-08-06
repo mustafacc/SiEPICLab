@@ -21,10 +21,10 @@ tls = tls_keysight(rm.open_resource('mainframe'), chan='0')
 pm1 = PowerMonitor_keysight(rm.open_resource('power_monitor'), chan='1')
 pm2 = PowerMonitor_keysight(rm.open_resource('power_monitor'), chan='2')
 # %% sequence definition
-sequence = SweepWavelengthSpectrum(mf, tls, [pm2])
-sequence.wavlStart = 1480  # nm
-sequence.wavlStop = 1580  # nm
-sequence.wavlPts = 1000  # number of points
+sequence = SweepWavelengthSpectrum(mf, tls, [pm1, pm2])
+sequence.wavl_start = 1480  # nm
+sequence.wavl_stop = 1580  # nm
+sequence.wavl_pts = 1150  # number of points
 sequence.pwr = 1  # mW
 sequence.sweep_speed = 20  # nm/s
 sequence.upper_limit = -10  # maximum power expected (dbm, -100: existing setting.)

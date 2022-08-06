@@ -28,6 +28,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
         self.tls = tls
         self.pm = pm
 
+        # if user configures only a single power monitor not then make it a list
         if type(self.pm) != list:
             self.pm = [self.pm]
 
@@ -37,15 +38,11 @@ class SweepWavelengthSpectrum(measurements.sequence):
         self.wavl_pts = 501  # number of points
         self.pwr = 1  # laser power, mW
         self.sweep_speed = 20  # nm/s
-        self.pwr_range = -100  # maximum power expected (dbm, -100: existing setting.)
+        # maximum power expected (dbm, -100: existing setting.)
+        self.pwr_range = -100
 
         self.instruments = [mf, tls] + self.pm
         self.experiment = measurements.lab_setup(self.instruments)
-
-        self.wavl = int((self.wavl_stop+self.wavl_start)/2)
-        self.sweep_step = (self.wavl_stop-self.wavl_start)/(self.wavl_pts-1)
-
-        # if user configures only a single power monitor not then make it a list
 
     def setup(self):
         """Instruments setting to customizable sequence parameters."""
@@ -84,7 +81,8 @@ class SweepWavelengthSpectrum(measurements.sequence):
             p.SetAutoRanging(0)  # disable auto ranging
             p.SetPwrRange(self.upper_limit)
             p.SetPwrUnit('dBm')
-            p.SetPwrLoggingPar(self.wavl_pts, 0.5*self.sweep_step/self.sweep_speed)
+            p.SetPwrLoggingPar(self.wavl_pts, 0.5 *
+                               self.sweep_step/self.sweep_speed)
 
         self.tls.SetWavlLoggingStatus(True)
 
@@ -95,6 +93,9 @@ class SweepWavelengthSpectrum(measurements.sequence):
             for instr in self.instruments:
                 print(instr.identify())
             print('\nDone identifying instruments.')
+
+        self.wavl = int((self.wavl_stop+self.wavl_start)/2)
+        self.sweep_step = (self.wavl_stop-self.wavl_start)/(self.wavl_pts-1)
 
         self.setup()
         time_delays = 2.5
@@ -108,7 +109,8 @@ class SweepWavelengthSpectrum(measurements.sequence):
         time.sleep(time_delays)
 
         while self.tls.GetSweepRun():
-            time.sleep(time_delays)  # check every half a sec if the sweep is done
+            # check every half a sec if the sweep is done
+            time.sleep(time_delays)
 
         # fetch the sweep data from the buffers
         rslts_wavl = self.tls.GetWavlLoggingData()
