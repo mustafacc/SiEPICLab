@@ -36,10 +36,10 @@ class SweepWavelengthSpectrum(measurements.sequence):
         # sequnece default settings
         self.wavl_start = 1280  # nm
         self.wavl_stop = 1370  # nm
-        self.wavl_pts = 401  # number of points
+        self.wavl_pts = 601  # number of points
         self.pwr = 1  # laser power, mW
         self.sweep_speed = 20  # nm/s
-        self.pwr_range = -100  # maximum power expected (dbm, -100: existing setting.)
+        self.upper_limit = 0  # maximum power expected (dbm, -100: existing setting.)
 
         self.instruments = [mf, tls] + self.pm
         self.experiment = measurements.lab_setup(self.instruments)
@@ -141,3 +141,5 @@ class SweepWavelengthSpectrum(measurements.sequence):
 
         if self.verbose:
             print("\n***Sequence executed successfully.***")
+
+        return rslts_wavl, rslts_pwr
