@@ -1,3 +1,6 @@
+# Git generated files
+*.orig
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
