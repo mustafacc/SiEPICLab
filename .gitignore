@@ -1,3 +1,6 @@
+# Pickle generated files used for results storage
+*.pkl
+
 # Git generated files
 *.orig
 

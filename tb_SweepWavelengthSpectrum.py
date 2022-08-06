@@ -17,9 +17,9 @@ rm = visa.ResourceManager()
 
 # %% instruments definition
 mf = lwmm_keysight(rm.open_resource('mainframe'))  # mainframe
-tls = tls_keysight(rm.open_resource('mainframe'), chan='0')
-pm1 = PowerMonitor_keysight(rm.open_resource('power_monitor'), chan='1')
-pm2 = PowerMonitor_keysight(rm.open_resource('power_monitor'), chan='2')
+tls = tls_keysight(rm.open_resource('mainframe'), slot='0')
+pm1 = PowerMonitor_keysight(rm.open_resource('power_monitor'), chan='1', slot='1')
+pm2 = PowerMonitor_keysight(rm.open_resource('power_monitor'), chan='1', slot='2')
 # %% sequence definition
 sequence = SweepWavelengthSpectrum(mf, tls, [pm1, pm2])
 sequence.wavl_start = 1480  # nm

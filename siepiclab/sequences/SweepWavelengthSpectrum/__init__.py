@@ -64,7 +64,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
         self.mf.addr.write('TRIG:CONF LOOP')
         # set power meters to receive trigger (also check if there are multiple pms)
         for p in self.pm:
-            p.addr.write('TRIG'+str(p.chan)+':INP SME')
+            p.addr.write('TRIG'+str(p.slot)+':INP SME')
 
         # Configure tunable laser sweep settings
         # sweep mode, cycle number, start wavl, stop wavl, sweep speed, and step
@@ -115,13 +115,16 @@ class SweepWavelengthSpectrum(measurements.sequence):
         rslts_wavl = 1e9*self.tls.GetWavlLoggingData()  # nm
         rslts_pwr = np.zeros((rslts_wavl.size, len(self.pm)))
         for n, p in enumerate(self.pm):
-            rslts_pwr[:, n] = 1e3*p.GetPwrLoggingData()  # mW
+            if p.GetPwrUnit() == 'dBm':
+                rslts_pwr[:, n] = p.GetPwrLoggingData() # dBm
+            else:
+                rslts_pwr[:, n] = 1e3*p.GetPwrLoggingData()  # mW
 
         # disable power and wavelength logging for power monitor and tunable laser
         for p in self.pm:
             p.SetPwrLogging(False)
             p.SetAutoRanging(1)
-            p.addr.write('TRIG'+str(p.chan)+':INP IGN')
+            p.addr.write('TRIG'+str(p.slot)+':INP IGN')
         self.tls.SetWavlLoggingStatus(False)
         self.mf.addr.write('TRIG:CONF PASS')
 
@@ -131,7 +134,11 @@ class SweepWavelengthSpectrum(measurements.sequence):
         if self.visual:
             import matplotlib.pyplot as plt
             plt.figure(figsize=(11, 6))
-            plt.plot(rslts_wavl, 10*np.log10(rslts_pwr))
+            for i in range(0,len(self.pm)):
+                if self.pm[i].GetPwrUnit() == 'dBm':
+                    plt.plot(rslts_wavl, rslts_pwr[:,i])
+                else:
+                    plt.plot(rslts_wavl, 10*np.log10(rslts_pwr[:,i]))
             plt.xlim(min(rslts_wavl), max(rslts_wavl))
             plt.xlabel('Wavelength [nm]')
             plt.ylabel('Optical Power [dBm]')

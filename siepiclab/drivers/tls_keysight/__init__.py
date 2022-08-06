@@ -505,5 +505,5 @@ class tls_keysight(instruments.instr_VISA):
             Wavelength logging data.
 
         """
-        cmd = 'SOUR'+self.chan+':READ:DATA? LLOG'
+        cmd = 'SOUR'+self.slot+':READ:DATA? LLOG'
         return np.array(self.addr.query_binary_values(cmd, datatype='d', is_big_endian=False))

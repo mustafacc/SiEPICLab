@@ -62,10 +62,10 @@ class instr_VISA(instr):
     write
     """
 
-    def __init__(self, addr, chan=None):
+    def __init__(self, addr, slot=None):
         super(instr_VISA, self).__init__()
         self.addr = addr
-        self.chan = chan
+        self.slot = slot
 
     def identify(self):
         """
@@ -114,7 +114,7 @@ class instr_VISA(instr):
         None.
 
         """
-        return(self.addr.query(cmd1+self.chan+cmd2))
+        return(self.addr.query(cmd1+self.slot+cmd2))
 
     def write(self, cmd1, cmd2=''):
         """
@@ -132,7 +132,7 @@ class instr_VISA(instr):
         None.
 
         """
-        if self.chan:
-            self.addr.write(cmd1+self.chan+cmd2)
+        if self.slot:
+            self.addr.write(cmd1+self.slot+cmd2)
         else:
             self.addr.write(cmd1+cmd2)
