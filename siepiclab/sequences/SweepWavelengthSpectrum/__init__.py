@@ -35,7 +35,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
         # sequnece default settings
         self.wavl_start = 1280  # nm
         self.wavl_stop = 1370  # nm
-        self.wavl_pts = 501  # number of points
+        self.wavl_pts = 401  # number of points
         self.pwr = 1  # laser power, mW
         self.sweep_speed = 20  # nm/s
         # maximum power expected (dbm, -100: existing setting.)
@@ -113,10 +113,10 @@ class SweepWavelengthSpectrum(measurements.sequence):
             time.sleep(time_delays)
 
         # fetch the sweep data from the buffers
-        rslts_wavl = self.tls.GetWavlLoggingData()
+        rslts_wavl = 1e9*self.tls.GetWavlLoggingData()  # nm
         rslts_pwr = np.zeros((rslts_wavl.size, len(self.pm)))
         for n, p in enumerate(self.pm):
-            rslts_pwr[:, n] = p.GetPwrLoggingData()
+            rslts_pwr[:, n] = 1e3*p.GetPwrLoggingData()  # mW
 
         # disable power and wavelength logging for power monitor and tunable laser
         for p in self.pm:
@@ -125,6 +125,17 @@ class SweepWavelengthSpectrum(measurements.sequence):
             p.addr.write('TRIG'+str(p.chan)+':INP IGN')
         self.tls.SetWavlLoggingStatus(False)
         self.mf.addr.write('TRIG:CONF PASS')
+
+        if self.visual:
+            import matplotlib.pyplot as plt
+            plt.figure(figsize=(11, 6))
+            plt.plot(rslts_wavl, 10*np.log10(rslts_pwr))
+            plt.xlim(min(rslts_wavl), max(rslts_wavl))
+            plt.xlabel('Wavelength [nm]')
+            plt.ylabel('Optical Power [dBm]')
+            plt.title(
+                f"Result of Wavelength Spectrum Sweep.\nLaser power: {self.tls.GetPwr()} {self.tls.GetPwrUnit()}")
+            plt.tight_layout()
 
         if self.verbose:
             print("\n***Sequence executed successfully.***")
