@@ -71,30 +71,22 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         self.SetPwrLoggingPar(state['num_pts'], state['avg_time'], verbose=True)
         self.SetPwrLogging(state['pwr_logging'], verbose=True)
 
-    def GetPwr(self, log=False):
+    def GetPwr(self):
         """
         Get the measured power at the optical power meter.
-
-        Parameters
-        ----------
-        log : Boolean, optional
-            Flag to get in log (dBm) or linear (mW). The default is mW.
 
         Returns
         -------
         pwr : float
-            Measured power at the detector (in selected unit).
+            Measured power at the detector (in selected unit from instrument).
 
         """
         if self.slot is not None:
             re = self.addr.query(':READ{}:CHAN{}:POW?'.format(self.slot, self.chan))
         else:
             re = self.query(':READ', ':POW?')
-        if log:
-            pwr = 10*np.log10(1e3*float(str(re.strip())))
-            return pwr
-        else:
-            pwr = 1e3*float(str(re.strip()))
+
+        pwr = float(str(re.strip()))
         return pwr
 
     def GetZeroAll(self):
