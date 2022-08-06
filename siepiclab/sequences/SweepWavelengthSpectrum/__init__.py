@@ -36,7 +36,8 @@ class SweepWavelengthSpectrum(measurements.sequence):
         # sequnece default settings
         self.wavl_start = 1280  # nm
         self.wavl_stop = 1370  # nm
-        self.wavl_pts = 601  # number of points
+        self.target_wavl_pts = 601  # number of points
+        self.wavl_pts = self.target_wavl_pts
         self.pwr = 1  # laser power, mW
         self.sweep_speed = 20  # nm/s
         self.upper_limit = 0  # maximum power expected (dbm, -100: existing setting.)
@@ -76,6 +77,10 @@ class SweepWavelengthSpectrum(measurements.sequence):
         self.tls.SetSweepStop(self.wavl_stop)
         self.tls.SetSweepSpeed(self.sweep_speed)
         self.tls.SetSweepStep(self.sweep_step)
+        
+        # Update number of points since this is instrument limited based on 
+        # sweep speed and step
+        self.wavl_pts = self.tls.GetNumTriggers()
 
         for idx, p in enumerate(self.pm):
             p.SetAutoRanging(0)  # disable auto ranging
@@ -94,7 +99,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
             print('\nDone identifying instruments.')
 
         self.wavl = int((self.wavl_stop+self.wavl_start)/2)
-        self.sweep_step = (self.wavl_stop-self.wavl_start)/(self.wavl_pts-1)
+        self.sweep_step = (self.wavl_stop-self.wavl_start)/(self.target_wavl_pts-1)
 
         self.setup()
         time_delays = 2.5

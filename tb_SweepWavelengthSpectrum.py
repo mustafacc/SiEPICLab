@@ -24,7 +24,7 @@ pm2 = PowerMonitor_keysight(rm.open_resource('power_monitor'), chan='1', slot='2
 sequence = SweepWavelengthSpectrum(mf, tls, [pm1, pm2])
 sequence.wavl_start = 1480  # nm
 sequence.wavl_stop = 1580  # nm
-sequence.wavl_pts = 1150  # number of points
+sequence.target_wavl_pts = 123  # number of points
 sequence.pwr = 1  # mW
 sequence.sweep_speed = 20  # nm/s
 sequence.upper_limit = -10  # maximum power expected (dbm, -100: existing setting.)

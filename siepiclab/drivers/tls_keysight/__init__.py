@@ -294,6 +294,19 @@ class tls_keysight(instruments.instr_VISA):
             self.wait()
         if verbose:
             return(self.GetSweepStart())
+        
+    def GetNumTriggers(self):
+        """
+        Get number of triggers or wavelength points in a sweep
+
+        Returns
+        -------
+        int
+            Number of triggers or wavelength points in a sweep.
+
+        """
+        re = self.query('SOUR', ':WAV:SWE:EXP?')
+        return int(str(re.strip()))
 
     def GetSweepStop(self):
         """
