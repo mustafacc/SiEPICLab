@@ -24,6 +24,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
     """
 
     def __init__(self, mf, tls, pm):
+        super(SweepWavelengthSpectrum, self).__init__()
         self.mf = mf
         self.tls = tls
         self.pm = pm
@@ -123,6 +124,9 @@ class SweepWavelengthSpectrum(measurements.sequence):
         self.tls.SetWavlLoggingStatus(False)
         self.mf.addr.write('TRIG:CONF PASS')
 
+        self.results.add('rslts_wavl', rslts_wavl)
+        self.results.add('rslts_pwr', rslts_pwr)
+
         if self.visual:
             import matplotlib.pyplot as plt
             plt.figure(figsize=(11, 6))
@@ -130,6 +134,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
             plt.xlim(min(rslts_wavl), max(rslts_wavl))
             plt.xlabel('Wavelength [nm]')
             plt.ylabel('Optical Power [dBm]')
+            plt.legend(['CH'+str(idx) for idx, val in enumerate(self.pm)])
             plt.title(
                 f"Result of Wavelength Spectrum Sweep.\nLaser power: {self.tls.GetPwr()} {self.tls.GetPwrUnit()}")
             plt.tight_layout()
