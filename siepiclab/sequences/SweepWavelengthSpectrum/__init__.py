@@ -24,6 +24,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
     """
 
     def __init__(self, mf, tls, pm):
+        super(SweepWavelengthSpectrum, self).__init__()
         self.mf = mf
         self.tls = tls
         self.pm = pm
@@ -35,11 +36,10 @@ class SweepWavelengthSpectrum(measurements.sequence):
         # sequnece default settings
         self.wavl_start = 1280  # nm
         self.wavl_stop = 1370  # nm
-        self.wavl_pts = 401  # number of points
+        self.wavl_pts = 601  # number of points
         self.pwr = 1  # laser power, mW
         self.sweep_speed = 20  # nm/s
-        # maximum power expected (dbm, -100: existing setting.)
-        self.pwr_range = -100
+        self.upper_limit = 0  # maximum power expected (dbm, -100: existing setting.)
 
         self.instruments = [mf, tls] + self.pm
         self.experiment = measurements.lab_setup(self.instruments)
@@ -80,9 +80,8 @@ class SweepWavelengthSpectrum(measurements.sequence):
         for idx, p in enumerate(self.pm):
             p.SetAutoRanging(0)  # disable auto ranging
             p.SetPwrRange(self.upper_limit)
-            p.SetPwrUnit('mW')
-            p.SetPwrLoggingPar(self.wavl_pts, 0.5 *
-                               self.sweep_step/self.sweep_speed)
+            p.SetPwrUnit('dBm')
+            p.SetPwrLoggingPar(self.wavl_pts, 0.5*self.sweep_step/self.sweep_speed)
 
         self.tls.SetWavlLoggingStatus(True)
 
@@ -126,6 +125,9 @@ class SweepWavelengthSpectrum(measurements.sequence):
         self.tls.SetWavlLoggingStatus(False)
         self.mf.addr.write('TRIG:CONF PASS')
 
+        self.results.add('rslts_wavl', rslts_wavl)
+        self.results.add('rslts_pwr', rslts_pwr)
+
         if self.visual:
             import matplotlib.pyplot as plt
             plt.figure(figsize=(11, 6))
@@ -133,9 +135,12 @@ class SweepWavelengthSpectrum(measurements.sequence):
             plt.xlim(min(rslts_wavl), max(rslts_wavl))
             plt.xlabel('Wavelength [nm]')
             plt.ylabel('Optical Power [dBm]')
+            plt.legend(['CH'+str(idx) for idx, val in enumerate(self.pm)])
             plt.title(
                 f"Result of Wavelength Spectrum Sweep.\nLaser power: {self.tls.GetPwr()} {self.tls.GetPwrUnit()}")
             plt.tight_layout()
 
         if self.verbose:
             print("\n***Sequence executed successfully.***")
+
+        return rslts_wavl, rslts_pwr

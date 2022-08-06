@@ -27,7 +27,7 @@ class lab_setup:
 
         """
         settings = []
-        for instr in self.instruments:
+        for idx, instr in enumerate(self.instruments):
             settings.append(instr.GetState())
             if verbose:
                 print('State of: ' + instr.identify())
@@ -122,8 +122,8 @@ class results:
 
         Returns
         -------
-        TYPE
-            DESCRIPTION.
+        Dictionary
+            Dictionary containing the loaded data results.
 
         """
         with open(str(file_name)+'.pkl', 'rb') as f:
@@ -137,12 +137,18 @@ class sequence:
         self.verbose = verbose
         self.visual = visual
         self.results = results()
+        self.instruments = []
         return
 
     def execute(self):
         """Execute the routine."""
         # get the initial state of the experiment
         settings = self.experiment.GetSettings(self.verbose)
+
+        # add the instrument state to the results file
+        for idx, state in enumerate(settings):
+            self.results.data['state_'+self.instruments[idx].identify()
+                              ] = str(state.GetState())
 
         self.instructions()
 

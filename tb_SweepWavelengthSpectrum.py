@@ -32,3 +32,5 @@ sequence.verbose = True  # turn on verbose logging mode
 sequence.visual = True  # visualize the wavelength sweep results
 
 sequence.execute()
+
+sequence.results.save()

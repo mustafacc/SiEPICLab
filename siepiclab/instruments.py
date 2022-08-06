@@ -43,6 +43,13 @@ class state:
         return self.state
 
 
+class instruction:
+    """Instrument instruction abstraction class."""
+
+    def __init__(self):
+        return
+
+
 class instr_VISA(instr):
     """
     VISA instrument class.
@@ -56,6 +63,7 @@ class instr_VISA(instr):
     """
 
     def __init__(self, addr, chan=None):
+        super(instr_VISA, self).__init__()
         self.addr = addr
         self.chan = chan
 
