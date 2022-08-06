@@ -86,9 +86,9 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            re = self.addr.query(':FETC'+str(self.chan)+':CHAN'+str(self.slot)+':POW?')
+            re = self.addr.query(':READ'+str(self.chan)+':CHAN'+str(self.slot)+':POW?')
         else:
-            re = self.query(':FETC', ':POW?')
+            re = self.query(':READ', ':POW?')
         if log:
             pwr = 10*np.log10(1e3*float(str(re.strip())))
             return pwr
@@ -467,7 +467,61 @@ class PowerMonitor_keysight(instruments.instr_VISA):
 
         """
         if self.slot is not None:
-            cmd = 'SENS'+str(self.chan)+':CHAN'+str(self.slot)+':FUNC:RES?'
+            cmd = 'SENS{}:CHAN{}:FUNC:RES?'.format(self.chan, self.slot)
         else:
-            cmd = 'SENS:CHAN'+self.chan+':FUNC:RES?'
+            cmd = 'SENS:CHAN{}:FUNC:RES?'.format(self.chan)
         return np.array(self.addr.query_binary_values(cmd))
+    
+    def GetInputTrigger(self):
+        """
+        Get input trigger status
+
+        Parameters
+        ----------
+        slot : int
+            Power meter slot to fetch the data buffer from.
+
+        Returns
+        -------
+        str
+            Trigger status
+
+        """
+        if self.slot is not None:
+            cmd = ':TRIG{}:CHAN{}:INP?'.format(self.chan, self.slot)
+        else:
+            cmd = ':TRIG{}:CHAN:INP?'.format(self.chan)
+        return self.addr.query(cmd)
+    
+    def SetInputTrigger(self, trigger, verbose=False, wait=False):
+        """
+        Set what the input trigger will respond to
+
+        Parameters
+        ----------
+        trigger : str
+            Options are:
+                'IGN' - Ignore trigger
+                'SME' - Start single measurement
+                'CME' - Start complete measurement
+                'MM'  - Start multiple complete measurements 
+        verbose : bool, optional
+            Return the instrument reading after the operation.
+            The default is False.
+        wait : bool, optional
+            Block program until the query is done. The default is False.
+
+        Returns
+        -------
+        None unless verbose is True.
+
+        """
+        
+        if self.slot is not None:
+            self.addr.write(':TRIG{}:CHAN{}:INP {}'.format(self.chan, self.slot, trigger))
+        else:
+            self.write(':TRIG{}:CHAN:INP {}'.format(self.chan, trigger))
+        if wait or verbose:
+            self.wait()
+        if verbose:
+            return self.GetInputTrigger()
