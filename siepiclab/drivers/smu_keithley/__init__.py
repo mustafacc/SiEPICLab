@@ -72,7 +72,10 @@ class smu_keithley(instruments.instr_VISA):
 
     def GetOutput(self, chan):
         if chan == 'A':
-            status = int(float(self.addr.query("print(smua.source.output)")))
+            try:
+                status = int(float(self.addr.query("print(smua.source.output)")))
+            except ValueError:
+                status = 0
             return status
         if chan == 'B':
             status = int(float(self.addr.query("print(smub.source.output)")))

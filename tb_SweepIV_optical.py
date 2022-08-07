@@ -15,14 +15,13 @@ rm = visa.ResourceManager()
 
 # %% instruments definition
 smu = smu_keithley(rm.open_resource('keithley_2602'))
-pm1 = PowerMonitor_keysight(rm.open_resource('mainframe_1550'), chan='1', slot='1')
-pm2 = PowerMonitor_keysight(rm.open_resource('mainframe_1550'), chan='1', slot='2')
+pm1 = PowerMonitor_keysight(rm.open_resource('mainframe_1550'), chan='1', slot='3')
 # %% routine definition
 v_min = 0
 v_max = 1
 v_res = 0.05
 
-sequence = SweepIV_optical(smu, [pm1, pm2])
+sequence = SweepIV_optical(smu, [pm1])
 sequence.v_pts = np.arange(v_min, v_max, v_res)
 sequence.chan = 'B'
 sequence.verbose = True
