@@ -8,6 +8,18 @@ import pickle
 from datetime import datetime
 
 
+class routine:
+    """Measurement routine abstraction class."""
+
+    def __init__(self):
+        self.routine = dict()
+        return
+
+    def add(self, name, sequence):
+        """Add a sequence to the routine."""
+        self.routine[str(name)] = sequence
+
+
 class lab_setup:
     """Experiment lab setup abstraction class."""
 
@@ -133,19 +145,21 @@ class results:
 class sequence:
     """Operations sequence abstraction class."""
 
-    def __init__(self, visual=False, verbose=False):
+    def __init__(self, visual=False, verbose=False, saveplot=False):
         self.verbose = verbose
         self.visual = visual
+        self.saveplot = saveplot
         self.results = results()
         self.instruments = []
         return
 
     def execute(self):
-        """Execute the routine."""
+        """Execute the sequence."""
         # get the initial state of the experiment
         settings = self.experiment.GetSettings(self.verbose)
 
         # add the instrument state to the results file
+        self.results.add('instruments', [instr.identify() for instr in self.instruments])
         for idx, state in enumerate(settings):
             self.results.data['state_'+self.instruments[idx].identify()
                               ] = str(state.GetState())

@@ -86,7 +86,7 @@ class SweepIV_opticalinput(measurements.sequence):
             plt.legend()
             plt.xlabel('Voltage [V]')
             plt.ylabel('Current [mA]')
-            plt.title('Result of IVSweep sequence.')
+            plt.title('Result of SweepIV_opticalinput sequence.')
             plt.tight_layout()
             if self.saveplot:
                 fname = str(datetime.now().strftime('%Y%m%d%H%M%S'))
