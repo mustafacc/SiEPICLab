@@ -68,7 +68,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         self.SetPwrRange(state['pwr_range'], verbose=True)
         self.SetPwrUnit(state['pwr_unit'], verbose=True)
         self.SetPwrLoggingPar(state['num_pts'], state['avg_time'], verbose=True)
-        self.SetPwrLogging(state['pwr_logging'], verbose=True)
+        #self.SetPwrLogging(state['pwr_logging'], verbose=True)
 
     def GetPwr(self, log=False):
         """

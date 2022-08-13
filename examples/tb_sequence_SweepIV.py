@@ -8,20 +8,19 @@ Mustafa Hammood, SiEPIC Kits, 2022
 # %%
 import pyvisa as visa
 import numpy as np
-from siepiclab.sequences.SweepIV_optical import SweepIV_optical
+from siepiclab.sequences.SweepIV import SweepIV
 from siepiclab.drivers.smu_keithley import smu_keithley
-from siepiclab.drivers.PowerMonitor_keysight import PowerMonitor_keysight
 rm = visa.ResourceManager()
 
 # %% instruments definition
-smu = smu_keithley(rm.open_resource('keithley_2602'))
-pm1 = PowerMonitor_keysight(rm.open_resource('mainframe_1550'), chan='1', slot='3')
-# %% routine definition
-v_min = 0
-v_max = 1
-v_res = 0.05
+smu = smu_keithley(rm.open_resource('keithley_2604b'))
 
-sequence = SweepIV_optical(smu, [pm1])
+# %% routine definition
+v_min = 1
+v_max = 0
+v_res = 0.01
+
+sequence = SweepIV(smu)
 sequence.v_pts = np.arange(v_min, v_max, v_res)
 sequence.chan = 'B'
 sequence.verbose = True

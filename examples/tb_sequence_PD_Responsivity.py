@@ -7,23 +7,28 @@ Mustafa Hammood, SiEPIC Kits, 2022
 """
 # %%
 import pyvisa as visa
-import numpy as np
-from siepiclab.sequences.SweepIV_opticalinput import SweepIV_opticalinput
+from siepiclab.sequences.PD_Responsivity import PD_Responsivity
 from siepiclab.drivers.smu_keithley import smu_keithley
+from siepiclab.drivers.PowerMonitor_keysight import PowerMonitor_keysight
 from siepiclab.drivers.tls_keysight import tls_keysight
 rm = visa.ResourceManager()
 
 # %% instruments definition
-smu = smu_keithley(rm.open_resource('keithley_2602'))
+smu = smu_keithley(rm.open_resource('keithley_2604b'))
+pm = PowerMonitor_keysight(rm.open_resource('mainframe_1550'), chan='1', slot='2')
 tls = tls_keysight(rm.open_resource('mainframe_1550'), chan='0')
 # %% routine definition
-v_min = 0
-v_max = 1
-v_res = 0.05
 
-sequence = SweepIV_opticalinput(smu, tls)
-sequence.v_pts = np.arange(v_min, v_max, v_res)
-sequence.chan = 'B'
+sequence = PD_Responsivity(smu, pm, tls)
+sequence.smu_v_bias = [0, -2]
+sequence.smu_chan = 'B'
+
+sequence.wavl_start = 1300
+sequence.wavl_stop = 1320
+sequence.wavl_pts = 100
+sequence.laser_pwr = 9
+sequence.loss_coupling = 6
+
 sequence.verbose = True
 sequence.visual = True
 sequence.saveplot = True

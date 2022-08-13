@@ -1,22 +1,24 @@
 """
 SiEPIClab measurement sequence.
 
-Current-Voltage (IV) sweep using a source measurement unit while varying optical input power
+Current-Voltage (IV) sweep using a source measurement unit while varying optical input power on a photodiode
 
 Mustafa Hammood, SiEPIC Kits, 2022
 """
 from siepiclab import measurements
 import numpy as np
 from datetime import datetime
+import time
 
 
-class SweepIV_opticalinput(measurements.sequence):
+class SweepIV_photodiode(measurements.sequence):
     """
-    Current-Voltage (IV) sweep using a source measurement unit and input optical power using a laser.
+    Current-Voltage (IV) sweep using a source measurement unit and input optical power using a laser on a photodiode.
 
     Test setup:
         SMU <-GS-> ||DUT||
-        laser -SMF-> ||DUT||
+        laser -SMF-> 3 dB splitter -SMF-> ||DUT||
+        laser -SMF-> 3 dB splitter -SMF-> power monitor (reference calibration)
 
     verbose : Boolean, Optional.
         Verbose messages and plots flag. Default is False.
@@ -24,8 +26,8 @@ class SweepIV_opticalinput(measurements.sequence):
         Visualization flag. Default is False.
     """
 
-    def __init__(self, smu, laser):
-        super(SweepIV_opticalinput, self).__init__()
+    def __init__(self, smu, laser, pm):
+        super(SweepIV_photodiode, self).__init__()
         self.smu = smu
         self.v_pts = [0]
         self.chan = 'A'
@@ -33,7 +35,11 @@ class SweepIV_opticalinput(measurements.sequence):
         self.laser = laser
         self.laser_pwr = [0, 1, 2]  # mW
         self.laser_wavl = 1310  # nm
-        self.instruments = [smu, laser]
+
+        self.pm = pm
+        self.loss_coupling = 4  # dB
+
+        self.instruments = [smu, laser, pm]
         self.experiment = measurements.lab_setup(self.instruments)
 
     def instructions(self):
@@ -45,6 +51,9 @@ class SweepIV_opticalinput(measurements.sequence):
             print('\nDone identifying instruments.')
         self.smu.SetOutput(1, self.chan)
 
+        self.pm.SetWavl(self.laser_wavl)
+        self.pm.SetPwrUnit('mW')
+
         self.laser.SetPwrUnit('mW')
         self.laser.SetWavl(self.laser_wavl)
         self.laser.SetOutput(1)
@@ -52,14 +61,18 @@ class SweepIV_opticalinput(measurements.sequence):
         volt = np.zeros((np.size(self.v_pts), np.size(self.laser_pwr)))
         curr = np.zeros((np.size(self.v_pts), np.size(self.laser_pwr)))
         res = np.zeros((np.size(self.v_pts), np.size(self.laser_pwr)))
+        pm_pwr = []
         laser_pwr = []
         for ii, pwr in enumerate(self.laser_pwr):
             if pwr == 0:
                 self.laser.SetOutput(0)
                 laser_pwr.append(0)
+                pm_pwr.append(0)
             else:
                 laser_pwr.append(self.laser.SetPwr(pwr, verbose=True))
                 self.laser.SetOutput(1)
+                pm_pwr.append(self.pm.GetPwr())
+            time.sleep(2)
             for idx, v in enumerate(self.v_pts):
                 self.smu.SetVoltage(v, self.chan)
                 volt[idx, ii] = self.smu.GetVoltage(self.chan)
@@ -79,17 +92,17 @@ class SweepIV_opticalinput(measurements.sequence):
             import matplotlib.pyplot as plt
 
             plt.figure(figsize=(11, 6))
-            for idx, p in enumerate(laser_pwr):
+            for idx, p in enumerate(pm_pwr):
                 plt.semilogy(volt[:, idx], 1e9*np.abs(curr[:, idx]),
-                             '.', label='Input = '+str(p) + ' mW')
+                             '.', label=f"Input {10*np.log10(p)-self.loss_coupling} dBm")
             plt.legend()
             plt.xlabel('Voltage [V]')
             plt.ylabel('Current [nA]')
-            plt.title('Result of SweepIV_opticalinput sequence.')
+            plt.title('Result of SweepIV_photodiode sequence.')
             plt.tight_layout()
             if self.saveplot:
                 fname = str(datetime.now().strftime('%Y%m%d%H%M%S'))
-                plt.savefig(fname+'_SweepIV_opticalinput.pdf')
+                plt.savefig(fname+'_SweepIV_photodiode.pdf')
 
         if self.verbose:
             print("\n***Sequence executed successfully.***")
