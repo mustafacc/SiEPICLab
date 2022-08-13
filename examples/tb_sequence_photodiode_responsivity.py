@@ -7,7 +7,7 @@ Mustafa Hammood, SiEPIC Kits, 2022
 """
 # %%
 import pyvisa as visa
-from siepiclab.sequences.PD_Responsivity import PD_Responsivity
+from siepiclab.sequences.photodiode_responsivity import photodiode_responsivity
 from siepiclab.drivers.smu_keithley import smu_keithley
 from siepiclab.drivers.PowerMonitor_keysight import PowerMonitor_keysight
 from siepiclab.drivers.tls_keysight import tls_keysight

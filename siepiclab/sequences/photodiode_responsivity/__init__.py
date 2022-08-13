@@ -11,7 +11,7 @@ from datetime import datetime
 import time
 
 
-class PD_Responsivity(measurements.sequence):
+class photodiode_responsivity(measurements.sequence):
     """
     Current-Voltage (IV) sweep using a source measurement unit.
 
@@ -27,7 +27,7 @@ class PD_Responsivity(measurements.sequence):
     """
 
     def __init__(self, smu, pm, laser):
-        super(PD_Responsivity, self).__init__()
+        super(photodiode_responsivity, self).__init__()
         self.smu = smu
         self.smu_v_bias = [0, -1, -2]
 
