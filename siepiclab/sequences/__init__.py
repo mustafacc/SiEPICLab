@@ -13,3 +13,4 @@ from testbench_fls_keysight import testbench_fls_keysight
 from testbench_tls_keysight import testbench_tls_keysight
 from SweepPolarization import SweepPolarization
 from SweepWavelength import SweepWavelength
+from SetupLDC501 import SetupLDC501
