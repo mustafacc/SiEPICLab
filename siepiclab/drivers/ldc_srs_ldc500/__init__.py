@@ -39,7 +39,7 @@ class ldc_srs_ldc500(instruments.instr_VISA):
             The measured temperature in Celsius.
 
         """
-        return float(self.instrument.query('TTRD?'))
+        return float(self.addr.query('TTRD?'))
 
     def SetTemperature(self, temp, verbose=False, wait=False):
         """
@@ -91,7 +91,7 @@ class ldc_srs_ldc500(instruments.instr_VISA):
             return False
 
     def GetLDVlim(self):
-        return(float(self.instrument.query('SVLM?')))
+        return(float(self.addr.query('SVLM?')))
 
     def SetLDVlim(self, Vlim, verbose=False, wait=False):
         """
@@ -119,7 +119,7 @@ class ldc_srs_ldc500(instruments.instr_VISA):
             return(self.GetLDVlim())
 
     def GetLDIlim(self):
-        return(float(self.instrument.query('SILM?')))
+        return(float(self.addr.query('SILM?')))
 
     def SetLDIlim(self, Ilim, verbose=False, wait=False):
         self.addr.write('SILM %g' % Ilim)
@@ -153,22 +153,22 @@ class ldc_srs_ldc500(instruments.instr_VISA):
             print("ERR: Invalid setting. Options are 1: HIGH, 0: LOW.")
 
     def GetPDbias(self):
-        return(float(self.instrument.query('BIAS?')))
+        return(float(self.addr.query('BIAS?')))
 
     def SetPDbias(self, Vbias):
         self.addr.write('BIAS %g' % float(Vbias))
 
     def GetPDcurrentLim(self):
-        return(float(self.instrument.query('PILM?')))
+        return(float(self.addr.query('PILM?')))
 
     def GetPDpowerLim(self):
-        return(float(self.instrument.query('PWLM?')))
+        return(float(self.addr.query('PWLM?')))
 
     def GetPDcurrent(self):
-        return(float(self.instrument.query('RIPD?')))
+        return(float(self.addr.query('RIPD?')))
 
     def GetPDpower(self):
-        return(float(self.instrument.query('RWPD?')))
+        return(float(self.addr.query('RWPD?')))
 
     def GetPDresp(self):
-        return(float(self.instrument.query('RESP?')))
+        return(float(self.addr.query('RESP?')))
