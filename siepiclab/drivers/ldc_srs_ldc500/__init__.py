@@ -39,7 +39,8 @@ class ldc_srs_ldc500(instruments.instr_VISA):
             The measured temperature in Celsius.
 
         """
-        return float(self.instrument.query('TTRD?'))
+        #return float(self.instrument.query('TTRD?'))
+        return float(self.addr.query('TTRD?'))
 
     def SetTemperature(self, temp, verbose=False, wait=False):
         """
