@@ -29,6 +29,7 @@ class ldc_srs_ldc500(instruments.instr_VISA):
 
         return 0
 
+    # TEC Settings:
     def GetTemperature(self):
         """
         Get the temperature of the DUT.
@@ -73,6 +74,16 @@ class ldc_srs_ldc500(instruments.instr_VISA):
     def tecOFF(self):
         self.addr.write('TEON OFF')
 
+    def tecMode(self, mode):
+        self.tecOFF()
+        if mode == 'CC':
+            self.addr.write('TMOD 0') # Set mode to CC
+        elif mode == 'CT':
+            self.addr.write('TMOD 1') # Set mode to CT
+        else:
+            raise NameError('Input only CC or CT.')
+
+    # LD Settings:
     def LDON(self):  # turn current on
         self.addr.write('SILD 0')  # set current to 0 first
         self.addr.write('LDON ON')
@@ -153,6 +164,7 @@ class ldc_srs_ldc500(instruments.instr_VISA):
         else:
             print("ERR: Invalid setting. Options are 1: HIGH, 0: LOW.")
 
+    # PD Settings:
     def GetPDbias(self):
         return(float(self.instrument.query('BIAS?')))
 

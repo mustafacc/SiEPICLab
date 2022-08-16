@@ -79,7 +79,7 @@ class PowerMonitor_keysight(instruments.instr_VISA):
         """
         re = self.query(':READ', ':POW?')
         if log:
-            pwr = 10*np.log10(1e3*float(str(re.strip())))
+            pwr = 10*np.log10(1e3*abs(float(str(re.strip()))))
             return pwr
         else:
             pwr = 1e3*float(str(re.strip()))

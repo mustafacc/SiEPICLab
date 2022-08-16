@@ -30,7 +30,7 @@ ldc = ldc_srs_ldc500(rm.open_resource(searchList(rm.list_resources(), "::2::")),
 pm = PowerMonitor_keysight(rm.open_resource(searchList(rm.list_resources(), "::20::")), chan='1')
 
 # %% sequence definition
-sequence = SetupLDC501(ldc)
+sequence = SetupLDC501(ldc, pm)
 sequence.execute(verbose=True)
 
 
