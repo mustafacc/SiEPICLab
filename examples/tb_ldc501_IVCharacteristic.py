@@ -12,8 +12,9 @@ With Templates and support from Mustafa Hammood, SiEPIC Kits, 2022
 """
 # %%
 import pyvisa as visa
-from siepiclab.sequences import SetupLDC501
-from siepiclab.drivers import ldc_srs_ldc500, PowerMonitor_keysight
+from siepiclab.sequences.SetupLDC501 import SetupLDC501
+from siepiclab.drivers.ldc_srs_ldc500 import ldc_srs_ldc500
+from siepiclab.drivers.PowerMonitor_keysight import PowerMonitor_keysight
 rm = visa.ResourceManager()
 
 
@@ -31,8 +32,11 @@ pm = PowerMonitor_keysight(rm.open_resource(searchList(rm.list_resources(), "::2
 
 # %% sequence definition
 sequence = SetupLDC501(ldc, pm)
-sequence.execute(verbose=True)
+#sequence.visual = True
+sequence.execute()
+sequence.results.save(file_name='test')
 
 
+pass
 
 # %%

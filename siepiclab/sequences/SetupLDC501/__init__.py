@@ -22,12 +22,10 @@ class SetupLDC501(measurements.sequence):
     """
 
     def __init__(self, ldc, pm):
+        super(SetupLDC501, self).__init__()
         self.ldc = ldc
         self.pm = pm
 
-        self.optimize = False
-        self.verbose = False
-        self.visual = False
         self.instruments = [ldc, pm]
         self.experiment = measurements.lab_setup(self.instruments)
 
@@ -70,32 +68,38 @@ class SetupLDC501(measurements.sequence):
             voltages = np.append(voltages,self.ldc.GetLDvoltage())
         self.ldc.SetLDcurrent(0)
         self.ldc.LDOFF()
+
+        self.results.add('currents', currents)
+        self.results.add('voltages', voltages)
+        self.results.add('powers', powers)
+        self.results.add('powersdbm', powersdbm)
         
 
-
+        
         #%% 
-        filename=(datetime.now().strftime('%Y%m%d%H%M%S')+'_Isweep')  
-        
-        plt.close(1)
-        plt.figure(1)
-        plt.plot(currents,voltages,'.k', label = 'Data')
-        plt.ylabel('Voltage (V)')
-        plt.xlabel('Current (mA)')    
-        #plt.savefig(filename+'_IV.png')
-        
-        plt.close(2)
-        plt.figure(2)
-        plt.plot(currents,powers,'.k', label = 'Data')
-        plt.ylabel('Power (dBm)')
-        plt.xlabel('Current (mA)')    
-        #plt.savefig(filename+'_LI.png')
+        if self.visual == True:
+            filename=(datetime.now().strftime('%Y%m%d%H%M%S')+'_Isweep')  
+            
+            plt.close(1)
+            plt.figure(1)
+            plt.plot(currents,voltages,'.k', label = 'Data')
+            plt.ylabel('Voltage (V)')
+            plt.xlabel('Current (mA)')    
+            #plt.savefig(filename+'_IV.png')
+            
+            plt.close(2)
+            plt.figure(2)
+            plt.plot(currents,powers,'.k', label = 'Data')
+            plt.ylabel('Power (dBm)')
+            plt.xlabel('Current (mA)')    
+            #plt.savefig(filename+'_LI.png')
 
-        plt.close(3)
-        plt.figure(3)
-        plt.plot(currents,powersdbm,'.k', label = 'Data')
-        plt.ylabel('Power (dBm)')
-        plt.xlabel('Current (mA)')    
-        #plt.savefig(filename+'_LI.png')
+            plt.close(3)
+            plt.figure(3)
+            plt.plot(currents,powersdbm,'.k', label = 'Data')
+            plt.ylabel('Power (dBm)')
+            plt.xlabel('Current (mA)')    
+            #plt.savefig(filename+'_LI.png')
 
         pass
 
