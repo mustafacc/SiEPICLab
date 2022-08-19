@@ -11,7 +11,7 @@ from siepiclab.drivers.opticalSwitch_jds import opticalSwitch_jds
 
 from time import sleep
 
-from random import randint
+
 
 class SwitchPath(measurements.sequence):
     
@@ -20,16 +20,22 @@ class SwitchPath(measurements.sequence):
         
         self.jds = jds
         self.instruments = [jds]
+
+        self.jds.SetOpticalPath(0)
         
         self.experiment = measurements.lab_setup(self.instruments)
+
+
 
     def instructions(self):
         """ Instructions for the sequence """
         print(self.jds.GetOpticalPath())
         #print(self.jds.opticalpath)
 
-        self.jds.SetOpticalPath(randint(1,8))
-        #self.jds.opticalpath(randint(1,8))
+        self.jds.SetOpticalPath(self.chan)
+        #self.jds.opticalpath(self.chan)
 
         sleep(2)
+        print(self.jds.GetOpticalPath())
+
         
