@@ -27,6 +27,7 @@ jds = opticalSwitch_jds(rm.open_resource(switch_gpib), chan='')
 sequence = SwitchPath(jds)
 
 sequence.chan = randint(1,8)
+sequence.jds.SetOpticalPath(0)
 
 sequence.execute()
 
