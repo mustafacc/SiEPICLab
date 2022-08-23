@@ -5,7 +5,6 @@ Wavelength spectrum sweep sequence using tunable laser source and optical power 
 
 Mustafa Hammood, SiEPIC Kits, 2022
 """
-from tabnanny import verbose
 from siepiclab import measurements
 import time
 import numpy as np
@@ -78,7 +77,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
         # Configure tunable laser sweep settings
         # sweep mode, cycle number, start wavl, stop wavl, sweep speed, and step
         # set tunable laser mode to continuous sweep
-        if self.mode.upper() == 'STEP'
+        if self.mode.upper() == 'STEP':
             self.tls.write('SOUR', ':WAV:SWE:MODE STEP')
         else:
             self.tls.write('SOUR', ':WAV:SWE:MODE CONT')
