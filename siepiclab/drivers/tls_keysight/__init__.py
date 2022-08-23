@@ -7,34 +7,16 @@ Mustafa Hammood, SiEPIC Kits, 2022
 """
 
 from siepiclab import instruments
+from siepiclab.drivers.fls_keysight import fls_keysight
 import numpy as np
 
 
-class tls_keysight(instruments.instr_VISA):
+class tls_keysight(fls_keysight):
     """
     HP-Agilent-Keysight tunable laser source class.
 
     Includes:
     """
-
-    def identify(self, slot=True):
-        """
-        Identify the instrument.
-
-        Parameters
-        ----------
-        slot : Boolean, optional
-            Flag if the instrument is a mainframe slot. The default is True.
-
-        Returns
-        -------
-        Instrument identifier (string).
-
-        """
-        if slot:
-            return(self.query('SLOT', ':IDN?').strip())
-        else:
-            return(instruments.instr_VISA.identify(self))
 
     def GetState(self):
         """Return an instance of the instrument."""
@@ -75,187 +57,6 @@ class tls_keysight(instruments.instr_VISA):
         self.SetSweepStep(state['sweep_step'], verbose=True)
         self.SetWavlLoggingStatus(state['wavl_logging'], verbose=True)
         self.SetSweepRun(state['sweep_run'], verbose=True)
-
-    def GetPwrUnit(self):
-        """
-        Get the unit setting in the instrument.
-
-        Returns
-        -------
-        unit : String
-            Unit setting of the instrument (mW or dBm).
-
-        """
-        re = self.query('SOUR', ':POW:UNIT?')
-        pwr_unit = int(str(re.strip()))
-        if pwr_unit == 1:
-            pwr_unit = 'mW'
-        else:
-            pwr_unit = 'dBm'
-        return pwr_unit
-
-    def SetPwrUnit(self, pwr_unit='mW', verbose=False, wait=False):
-        """
-        Set the unit setting in the instrument.
-
-        Parameters
-        ----------
-        pwr_unit : String, optional
-            The power unit to set. 'dBm' or 'mW'. The defautlt is 'mW'.
-        verbose : Boolean, optional
-            Return the instrument reading after the operation.
-            The default is False.
-        wait : Boolean, optional
-            Block program until the query is done. The default is False.
-
-        Returns
-        -------
-        None unless verbose is True.
-
-        """
-        valid_units = ['dbm', 'mw']
-        if pwr_unit.lower() not in valid_units:
-            print("ERR: Not a valid unit. Valid units are 'dBm' and 'mW', as str.")
-            return
-        if pwr_unit.lower() == 'dbm':
-            unit = 0
-        else:
-            unit = 1
-        self.write('SOUR', ':POW:UNIT '+str(unit))
-
-        if wait or verbose:
-            self.wait()
-        if verbose:
-            return(self.GetPwrUnit())
-
-    def GetPwr(self):
-        """
-        Get the output power of the laser.
-
-        Returns
-        -------
-        pwr : float
-            Output power of the laser (mW).
-
-        """
-        re = self.query('SOUR', ':POW?')
-        pwr = float(str(re.strip()))*1e3
-        return pwr
-
-    def SetPwr(self, pwr, verbose=False, wait=False):
-        """
-        Set the output power of the laser.
-
-        Parameters
-        ----------
-        pwr : float
-            Output power of the laser (mW).
-        verbose : Boolean, optional
-            Return the instrument reading after the operation.
-            The default is False.
-        wait : Boolean, optional
-            Block program until the query is done. The default is False.
-
-        Returns
-        -------
-        None unless verbose is True.
-
-        """
-        self.write('SOUR', ':POW '+str(pwr)+'mW')
-        if wait or verbose:
-            self.wait()
-        if verbose:
-            return(self.GetPwr())
-
-    def GetOutput(self):
-        """
-        Get the state of the laser output power (turned on or off).
-
-        Returns
-        -------
-        state : Boolean
-            State of the power output.
-                True: laser is turned on.
-                False: laser is turned off.
-
-        """
-        re = self.query('SOUR', ':POW:STAT?')
-        state = int(str(re.strip()))
-        if state == 1:
-            state = True
-            return state
-        else:
-            state = False
-            return state
-
-    def SetOutput(self, state, verbose=False, wait=False):
-        """
-        Set the state of the laser output power (turned on or off).
-
-        Parameters
-        ----------
-        state : Boolean
-            State of the power output.
-                True: laser is turned on.
-                False: laser is turned off.
-        verbose : Boolean, optional
-            Return the instrument reading after the operation.
-            The default is False.
-        wait : Boolean, optional
-            Block program until the query is done. The default is False.
-
-        Returns
-        -------
-        None unless verbose is True.
-
-        """
-        if state:
-            self.write('SOUR', ':POW:STAT 1')
-        else:
-            self.write('SOUR', ':POW:STAT 0')
-        if wait or verbose:
-            self.wait()
-        if verbose:
-            return(self.GetOutput())
-
-    def GetWavl(self):
-        """
-        Get the laser wavelength.
-
-        Returns
-        -------
-        wavl : float
-            Wavelength of the laser (nm)
-
-        """
-        re = self.query('SOUR', ':WAV?')
-        wavl = float(str(re.strip()))*1e9
-        return wavl
-
-    def SetWavl(self, wavl, verbose=False, wait=False):
-        """
-        Set the laser wavelength.
-
-        Parameters
-        ----------
-        wavl : float
-            Wavelength of the laser (nm)
-        verbose : Boolean, optional
-            Return the instrument reading after the operation.
-            The default is False.
-        wait : Boolean, optional
-            Block program until the query is done. The default is False.
-
-        Returns
-        -------
-        None unless verbose is True.
-
-        """
-        self.write('SOUR', ':WAV '+str(wavl)+'NM')
-        if wait or verbose:
-            self.wait()
-        if verbose:
-            return(self.GetWavl())
 
     def GetSweepStart(self):
         """
