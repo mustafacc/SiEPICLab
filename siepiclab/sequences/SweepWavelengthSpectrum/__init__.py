@@ -116,7 +116,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
         time.sleep(time_delays)
 
         # start the wavelength sweep
-        if verbose:
+        if self.verbose:
             print("***Starting Wavelength Sweep.***")
         self.tls.SetSweepRun(True)
         time.sleep(time_delays)
@@ -124,7 +124,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
         while self.tls.GetSweepRun():
             time.sleep(time_delays)  # check every half a sec if the sweep is done
        
-        if verbose:
+        if self.verbose:
             print("***Sweep Finished, fetching.***")
         # fetch the sweep data from the buffers
         if self.mode.upper() == 'STEP':
