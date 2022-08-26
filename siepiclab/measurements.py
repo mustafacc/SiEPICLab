@@ -151,6 +151,7 @@ class sequence:
         self.saveplot = saveplot
         self.results = results()
         self.instruments = []
+        self.file_name = ''
         return
 
     def execute(self):
