@@ -100,8 +100,9 @@ class SweepPolarization(measurements.sequence):
             maxT = np.max(pmReadOut)  # maximum transmission
             idx = np.where(pmReadOut == maxT)[0]
             self.polCtrl.SetPaddlePositionAll(samples[idx[0]])
+            self.results.add('idx', idx)
+            self.results.add('maxT', maxT)
 
-        self.results.add('idx', idx)
         self.results.add('pmReadOut', pmReadOut)
 
         if self.visual:
@@ -112,11 +113,19 @@ class SweepPolarization(measurements.sequence):
                 plt.plot(idx, 10*np.log10(self.pm.GetPwr()), 'x')
             plt.xlabel('Sample')
             plt.ylabel('Power [dBm]')
-            title1 = 'Polarization optimization sweep sequence\n'
+            title1 = str(self.file_name) + 'Polarization optimization sweep sequence\n'
             title2 = f'scanrate = {self.scanrate}, pwr = {10*np.log10(self.pwr)} dBm\n'
             title3 = f'wavl = {int(self.wavl)} nm, scantime = {self.scantime}'
 
             plt.title(title1+title2+title3)
             plt.tight_layout()
+
+            if self.saveplot:
+                plt.gcf()
+                plt.savefig(self.file_name + '.png', format='png')
+
+            plt.close()
+
         if self.verbose:
             print("\n***Sequence executed successfully.***")
+
