@@ -26,6 +26,10 @@ class SetupLDC501(measurements.sequence):
         self.ldc = ldc
         self.pm = pm
 
+        self.Imin=5
+        self.Imax=15
+        self.numPts=3
+
         self.instruments = [ldc, pm]
         self.experiment = measurements.lab_setup(self.instruments)
 
@@ -49,10 +53,7 @@ class SetupLDC501(measurements.sequence):
         # Setup 
 
         #%% LIV sweep using the LDC and large area PD
-        Imin=5
-        Imax=15
-        numPts=3
-        currentsSet=np.linspace(Imin,Imax,numPts)
+        currentsSet=np.linspace(self.Imin,self.Imax,self.numPts)
         currents=[]
         voltages=[]
         powers=[]
@@ -78,28 +79,43 @@ class SetupLDC501(measurements.sequence):
         
         #%% 
         if self.visual == True:
-            filename=(datetime.now().strftime('%Y%m%d%H%M%S')+'_Isweep')  
-            
+            #filename=(datetime.now().strftime('%Y%m%d%H%M%S')+'_Isweep')  
+            filename = self.file_name
+
             plt.close(1)
-            plt.figure(1)
+            plt.figure(1, figsize=(11, 6))
             plt.plot(currents,voltages,'.k', label = 'Data')
             plt.ylabel('Voltage (V)')
-            plt.xlabel('Current (mA)')    
-            #plt.savefig(filename+'_IV.png')
+            plt.xlabel('Current (mA)')
+            title1 = f'Voltage vs. Current Sweep from {self.Imin} to {self.Imax}'
+            plt.title(title1) 
+            plt.tight_layout()   
+            if self.saveplot:
+                plt.savefig(filename+'_IV.png')
+            
             
             plt.close(2)
-            plt.figure(2)
+            plt.figure(2, figsize=(11, 6))
             plt.plot(currents,powers,'.k', label = 'Data')
-            plt.ylabel('Power (dBm)')
-            plt.xlabel('Current (mA)')    
-            #plt.savefig(filename+'_LI.png')
+            plt.ylabel('Power (mW)')
+            plt.xlabel('Current (mA)')
+            title1 = f'Optical Power vs. Current Sweep from {self.Imin} to {self.Imax}'
+            plt.title(title1) 
+            plt.tight_layout()   
+            if self.saveplot:
+                plt.savefig(filename+'_LI(mW).png')
+                
 
             plt.close(3)
-            plt.figure(3)
+            plt.figure(3, figsize=(11, 6))
             plt.plot(currents,powersdbm,'.k', label = 'Data')
             plt.ylabel('Power (dBm)')
-            plt.xlabel('Current (mA)')    
-            #plt.savefig(filename+'_LI.png')
+            plt.xlabel('Current (mA)')
+            title1 = f'OPtical Power vs. Current Sweep from {self.Imin} to {self.Imax}'
+            plt.title(title1)
+            plt.tight_layout()    
+            if self.saveplot:
+                plt.savefig(filename+'_LI(db).png')
 
         pass
 
