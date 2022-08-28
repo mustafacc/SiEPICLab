@@ -12,7 +12,8 @@ from siepiclab.drivers.tls_keysight import tls_keysight
 rm = visa.ResourceManager()
 
 # %% instruments definition
-tls = tls_keysight(rm.open_resource('mainframe_1550'), chan='0')
+mainframe_1550 = 'GPIB0::20::INSTR'
+tls = tls_keysight(rm.open_resource(mainframe_1550), chan='2')
 
 # %% sequence definition
 sequence = testbench_tls_keysight(tls)

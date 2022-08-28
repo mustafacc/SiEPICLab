@@ -12,10 +12,11 @@ class testbench_tls_keysight(measurements.sequence):
     """Testbench measurement sequence for the tunable laser source class."""
 
     def __init__(self, tls):
+        super().__init__(self)
         self.tls = tls
 
-        instruments = [tls]
-        self.experiment = measurements.lab_setup(instruments)
+        self.instruments.append(tls)
+        self.experiment = measurements.lab_setup(self.instruments)
 
     def instructions(self):
         """Sequence of the routine."""
