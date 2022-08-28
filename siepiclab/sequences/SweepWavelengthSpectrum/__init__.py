@@ -16,14 +16,16 @@ class SweepWavelengthSpectrum(measurements.sequence):
 
     Test setup:
         tunable laser -SMF-> ||DUT|| -SMF-> Power Monitor(s)
-
+    
+    mode : String, Optional.
+        Sets sweep to continous or stepped. Default is continuous.
     verbose : Boolean, Optional.
         Verbose messages and plots flag. Default is False.
     visual : Boolean, Optional.
         Visualization flag. Default is False.
     """
 
-    def __init__(self, mf, tls, pm):
+    def __init__(self, mf, tls, pm, mode='CONT'):
         super(SweepWavelengthSpectrum, self).__init__()
         self.mf = mf
         self.tls = tls
@@ -33,7 +35,13 @@ class SweepWavelengthSpectrum(measurements.sequence):
         if type(self.pm) != list:
             self.pm = [self.pm]
 
-        # sequnece default settings
+        valid_modes = ['cont', 'step']
+        if mode.lower() not in valid_modes:
+            TypeError("ERR: Not a valid mode. Valid units are 'cont' and 'step', as str.")
+            return
+
+        # sequence default settings
+        self.mode = str(mode).lower() # Stepped or Continuous Sweep
         self.wavl_start = 1280  # nm
         self.wavl_stop = 1370  # nm
         self.wavl_pts = 601  # number of points
@@ -41,7 +49,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
         self.sweep_speed = 20  # nm/s
         self.upper_limit = 0  # maximum power expected (dbm, -100: existing setting.)
 
-        self.instruments = [mf, tls] + self.pm
+        self.instruments.extend([mf, tls] + self.pm)
         self.experiment = measurements.lab_setup(self.instruments)
 
     def setup(self):
@@ -69,7 +77,11 @@ class SweepWavelengthSpectrum(measurements.sequence):
         # Configure tunable laser sweep settings
         # sweep mode, cycle number, start wavl, stop wavl, sweep speed, and step
         # set tunable laser mode to continuous sweep
-        self.tls.write('SOUR', ':WAV:SWE:MODE CONT')
+        if self.mode.upper() == 'STEP':
+            self.tls.write('SOUR', ':WAV:SWE:MODE STEP')
+        else:
+            self.tls.write('SOUR', ':WAV:SWE:MODE CONT')
+        
         # set tunable laser sweep cycle number to 1
         self.tls.write('SOUR', ':WAV:SWE:CYCL 1')
         self.tls.SetSweepStart(self.wavl_start)
@@ -104,14 +116,23 @@ class SweepWavelengthSpectrum(measurements.sequence):
         time.sleep(time_delays)
 
         # start the wavelength sweep
+        if self.verbose:
+            print("***Starting Wavelength Sweep.***")
         self.tls.SetSweepRun(True)
         time.sleep(time_delays)
 
         while self.tls.GetSweepRun():
             time.sleep(time_delays)  # check every half a sec if the sweep is done
-
+       
+        if self.verbose:
+            print("***Sweep Finished, fetching.***")
         # fetch the sweep data from the buffers
-        rslts_wavl = 1e9*self.tls.GetWavlLoggingData()  # nm
+        if self.mode.upper() == 'STEP':
+            # The 81689A cannot log the wavelength (LLOG), hence we infer from our settings.
+            rslts_wavl = np.linspace(self.wavl_start, self.wavl_stop, num=self.wavl_pts)
+        else:
+            rslts_wavl = 1e9*self.tls.GetWavlLoggingData()  # nm
+
         rslts_pwr = np.zeros((rslts_wavl.size, len(self.pm)))
         for n, p in enumerate(self.pm):
             rslts_pwr[:, n] = 1e3*p.GetPwrLoggingData()  # mW
@@ -127,7 +148,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
         self.results.add('rslts_wavl', rslts_wavl)
         self.results.add('rslts_pwr', rslts_pwr)
 
-        if self.visual:
+        if self.visual or self.saveplot:
             import matplotlib.pyplot as plt
             plt.figure(figsize=(11, 6))
             plt.plot(rslts_wavl, 10*np.log10(rslts_pwr))
@@ -139,6 +160,9 @@ class SweepWavelengthSpectrum(measurements.sequence):
                 f"Result of Wavelength Spectrum Sweep.\nLaser power: {self.tls.GetPwr()} {self.tls.GetPwrUnit()}")
             plt.tight_layout()
 
+            if self.saveplot:
+                plt.savefig(str(self.file_name)+ "_wavsweep.png")
+                plt.close()
         if self.verbose:
             print("\n***Sequence executed successfully.***")
 
