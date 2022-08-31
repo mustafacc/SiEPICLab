@@ -30,6 +30,8 @@ class SetupLDC501(measurements.sequence):
         self.Imax=15
         self.numPts=3
 
+        self.temperature=25
+
         self.instruments = [ldc, pm]
         self.experiment = measurements.lab_setup(self.instruments)
 
@@ -39,7 +41,7 @@ class SetupLDC501(measurements.sequence):
         
         # TEC Settings:
         self.ldc.tecMode('CT')
-        self.ldc.SetTemperature(25)
+        self.ldc.SetTemperature(self.temperature)
     
         # Power Monitor Settings:
         self.pm.SetWavl(1270)
@@ -48,6 +50,8 @@ class SetupLDC501(measurements.sequence):
 
     def instructions(self):
         
+        if self.verbose:
+            print('*** Setting Up Instrument: ***\n')
         self.InstrSetting()
 
         # Setup 
@@ -59,6 +63,11 @@ class SetupLDC501(measurements.sequence):
         powers=[]
         powersdbm=[]
 
+        if self.verbose:
+            print('***Activating TEC...***')
+        self.ldc.tecON()
+        if self.verbose:
+            print('***Activating LD and Beginning Current Sweep...***')
         self.ldc.LDON()
         for ii, II in enumerate(currentsSet):
             self.ldc.SetLDcurrent(II)
@@ -67,6 +76,9 @@ class SetupLDC501(measurements.sequence):
             powersdbm = np.append(powersdbm,self.pm.GetPwr(True))
             currents = np.append(currents,self.ldc.GetLDcurrent())
             voltages = np.append(voltages,self.ldc.GetLDvoltage())
+        
+        if self.verbose:
+            print('***Turning Off LD:***')
         self.ldc.SetLDcurrent(0)
         self.ldc.LDOFF()
 
@@ -78,7 +90,7 @@ class SetupLDC501(measurements.sequence):
 
         
         #%% 
-        if self.visual == True:
+        if self.visual or self.saveplot == True:
             #filename=(datetime.now().strftime('%Y%m%d%H%M%S')+'_Isweep')  
             filename = self.file_name
 
@@ -87,11 +99,15 @@ class SetupLDC501(measurements.sequence):
             plt.plot(currents,voltages,'.k', label = 'Data')
             plt.ylabel('Voltage (V)')
             plt.xlabel('Current (mA)')
-            title1 = f'Voltage vs. Current Sweep from {self.Imin} to {self.Imax}'
-            plt.title(title1) 
+            title1 = str(self.file_name) + 'LDC Current Sweep Sequence\n'
+            title2 = f'Voltage vs. Current Sweep from {self.Imin} to {self.Imax}' + '\n'
+            title3 = f'Temperature = {int(self.temperature)} degC'
+            plt.title(title1+title2+title3) 
             plt.tight_layout()   
             if self.saveplot:
                 plt.savefig(filename+'_IV.png')
+            if not(self.visual):
+                plt.close(1)
             
             
             plt.close(2)
@@ -99,11 +115,15 @@ class SetupLDC501(measurements.sequence):
             plt.plot(currents,powers,'.k', label = 'Data')
             plt.ylabel('Power (mW)')
             plt.xlabel('Current (mA)')
-            title1 = f'Optical Power vs. Current Sweep from {self.Imin} to {self.Imax}'
-            plt.title(title1) 
+            title1 = str(self.file_name) + 'LDC Current Sweep Sequence\n'
+            title2 = f'Optical Power vs. Current Sweep from {self.Imin} to {self.Imax}\n'
+            title3 = f'Temperature = {int(self.temperature)} degC'
+            plt.title(title1+title2+title3) 
             plt.tight_layout()   
             if self.saveplot:
                 plt.savefig(filename+'_LI(mW).png')
+            if not(self.visual):
+                plt.close(2)
                 
 
             plt.close(3)
@@ -111,11 +131,19 @@ class SetupLDC501(measurements.sequence):
             plt.plot(currents,powersdbm,'.k', label = 'Data')
             plt.ylabel('Power (dBm)')
             plt.xlabel('Current (mA)')
-            title1 = f'OPtical Power vs. Current Sweep from {self.Imin} to {self.Imax}'
-            plt.title(title1)
+            title1 = str(self.file_name) + 'LDC Current Sweep Sequence\n'
+            title2 = f'Optical Power vs. Current Sweep from {self.Imin} to {self.Imax}\n'
+            title3 = f'Temperature = {int(self.temperature)} degC'
+            plt.title(title1+title2+title3)
             plt.tight_layout()    
             if self.saveplot:
                 plt.savefig(filename+'_LI(db).png')
+            if not(self.visual):
+                plt.close(3)
+
+        
+        if self.verbose:
+            print('\n***Sequence Complete! Exiting...***')
 
         pass
 
