@@ -12,10 +12,13 @@ class testbench_fls_keysight(measurements.sequence):
     """Testbench measurement sequence for the fixed laser source class."""
 
     def __init__(self, fls):
+        super().__init__(self)
         self.fls = fls
 
-        instruments = [fls]
-        self.experiment = measurements.lab_setup(instruments)
+        self.verbose = False
+        
+        self.instruments.append(fls)
+        self.experiment = measurements.lab_setup(self.instruments)
 
     def instructions(self):
         """Sequence of the routine."""
