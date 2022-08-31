@@ -30,7 +30,7 @@ rm = visa.ResourceManager()
 print(rm.list_resources())
 # %% instruments definition
 
-if False:
+if True:
     switch_gpib = 'GPIB0::7::INSTR'
     fls_gpib = 'GPIB0::20::INSTR'
     pol_gpib = 'GPIB0::8::INSTR'
@@ -43,19 +43,19 @@ else:
 jds = opticalSwitch_jds(rm.open_resource(switch_gpib), chan='')
 fls = fls_keysight(rm.open_resource(fls_gpib), chan='2')
 pol = PolCtrl_keysight(rm.open_resource(pol_gpib), chan='')
-pm = PowerMonitor_keysight(rm.open_resource(fls_gpib), chan='1')
+pm = PowerMonitor_keysight(rm.open_resource(fls_gpib), chan='1', slot=1)
 
 
 calibration = SweepPolarization_SwitchPaths(fls, pol, pm, jds)
 
-calibration.scantime = 30
-calibration.range = [3,4,5,6,7,8]
+calibration.scantime = 5
+calibration.range = [1, 2]
 calibration.visual = True
 calibration.verbose = True
 calibration.visual = True
 calibration.saveplot = True
 
-file_name = '2022-08-29_Test1_switch'
+file_name = '2022-08-31_SwitchPanelVerification'
 
 sequence = calibration
 
