@@ -15,11 +15,11 @@ from time import sleep
 
 class SwitchPath(measurements.sequence):
     
-    def __init__(self, jds, visual=False, verbose=False, saveplot=False):
+    def __init__(self, jds, visual=False, verbose=False, saveplot=False, **kwargs):  
         super(SwitchPath, self).__init__(visual, verbose, saveplot)
         
         self.jds = jds
-        self.instruments = [jds]
+        self.instruments.append(jds)
 
         self.jds.SetOpticalPath(0)
         
@@ -29,13 +29,13 @@ class SwitchPath(measurements.sequence):
 
     def instructions(self):
         """ Instructions for the sequence """
-        print(self.jds.GetOpticalPath())
+        print('Switching from: ' + str(self.jds.GetOpticalPath()))
         #print(self.jds.opticalpath)
 
         self.jds.SetOpticalPath(self.chan)
         #self.jds.opticalpath(self.chan)
 
         sleep(2)
-        print(self.jds.GetOpticalPath())
+        print('To Now at: ' + str(self.jds.GetOpticalPath()))
 
         

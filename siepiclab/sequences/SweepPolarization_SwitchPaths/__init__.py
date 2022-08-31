@@ -5,7 +5,7 @@ Polarization optimization and Measurement through Switch Paths
 
 Davin Birdi, UBC Photonics, 2022
 """
-from tabnanny import verbose
+
 from siepiclab import measurements
 from siepiclab.sequences.SwitchPath import SwitchPath
 from siepiclab.sequences.SweepPolarization import SweepPolarization
@@ -27,17 +27,15 @@ class SweepPolarization_SwitchPaths(SweepPolarization):
     """
 
     def __init__(self, fls, pol, pm, jds):
-        super().__init__(fls, pol, pm)
+        super(SweepPolarization_SwitchPaths, self).__init__(fls, pol, pm)
         
-        SwitchPath.__init__(self, jds)
-        
-        #self.jds = jds
+        self.jds = jds
 
-        self.scantime = 45
-        self.optimize = True
         self.range = [1, 2, 3]
+        self.optimize = True
+        
 
-        #self.instruments.append(jds)
+        self.instruments.append(jds)
         self.experiment = measurements.lab_setup(self.instruments)
 
     def instructions(self):
@@ -46,23 +44,31 @@ class SweepPolarization_SwitchPaths(SweepPolarization):
         if self.verbose:
             print("\n***Sequence Starting...***")
 
-        rslts_pm = []
+
+        rslts_maxT = []
+        rslts_minT = []
+
+        file_name = self.file_name
 
         for i in self.range:
             self.chan = i
+            self.file_name = str(file_name) + '-chan' + str(self.chan)
             if self.verbose:
                 print("\n***Switch Changing...***")
             SwitchPath.instructions(self)
             if self.verbose:
                 print("\n***Optimizing Polarization...***")
-            temp = SweepPolarization.instructions(self)
-            rslts_pm.append(max(temp))
-            if self.sweep == True:
-                pass
+            super().instructions()
+            maxT = self.results.data['maxT']
+            minT = self.results.data['minT']
+            rslts_maxT.append(maxT)
+            rslts_minT.append(minT)
 
             pass
 
-        self.results.add('rslts_pm', rslts_pm)
+        self.file_name = file_name
+        self.results.add('rslts_maxT', rslts_maxT)
+        self.results.add('rslts_minT', rslts_minT)
 
             
 
