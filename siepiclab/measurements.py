@@ -152,6 +152,7 @@ class sequence:
         self.results = results()
         self.instruments = []
         self.file_name = ''
+        self.reset_after_execution = True
         return
 
     def execute(self):
@@ -168,4 +169,5 @@ class sequence:
         self.instructions()
 
         # reset the experiment state to the initial state
-        self.experiment.SetSettings(settings)
+        if self.reset_after_execution:
+            self.experiment.SetSettings(settings)

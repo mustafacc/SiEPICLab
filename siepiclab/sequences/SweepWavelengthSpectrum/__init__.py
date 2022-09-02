@@ -42,12 +42,18 @@ class SweepWavelengthSpectrum(measurements.sequence):
 
         # sequence default settings
         self.mode = str(mode).lower() # Stepped or Continuous Sweep
-        self.wavl_start = 1280  # nm
-        self.wavl_stop = 1370  # nm
-        self.wavl_pts = 601  # number of points
         self.pwr = 1  # laser power, mW
         self.sweep_speed = 20  # nm/s
         self.upper_limit = 0  # maximum power expected (dbm, -100: existing setting.)
+
+        if mode == 'step':
+            self.wavl_start = 1524  # nm
+            self.wavl_stop = 1575  # nm
+            self.wavl_pts = 101  # number of points
+        else:
+            self.wavl_start = 1280  # nm
+            self.wavl_stop = 1370  # nm
+            self.wavl_pts = 601  # number of points
 
         self.instruments.extend([mf, tls] + self.pm)
         self.experiment = measurements.lab_setup(self.instruments)
