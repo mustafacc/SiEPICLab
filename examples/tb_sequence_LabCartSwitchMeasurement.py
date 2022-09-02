@@ -9,6 +9,7 @@ With Credit to:
 Mustafa Hammood, SiEPIC Kits, 2022
 """
 # %%
+from struct import calcsize
 import pyvisa as visa
 from measurements import sequence
 
@@ -25,6 +26,8 @@ from siepiclab.sequences.SwitchSequences import SwitchSequences
 
 
 import numpy as np
+from matplotlib import pyplot as plt
+from pandas import DataFrame
 
 
 rm = visa.ResourceManager()
@@ -80,15 +83,37 @@ calibration.results.save(calibration.file_name)
 #sequence.results.save(f"{chip_id}_{die_id}_{device_id}")
 
 """
-file_name = '2022-08-31-1524_NoPolTest_7-8'
+
+
+file_name = input('Save Measurement Results as: ')#'2022-08-31-1524_NoPolTest_7-8'
 
 sequence = SwitchSequences(tls, pm, mf, jds, verbose=True, saveplot=True, visual=True)
 #sequence = SwitchSequences(tls, pm, pol, mf, jds, verbose=True, saveplot=True, visual=True)
+sequence.range = [5,6,7,8]
+'''
+calibration = sequence
+calibration.file_name = file_name + 'calibration'
+
+while input('Press Y to start Calibration:').lower() != 'y':
+    pass
+calibration.execute()
+calibration.results.save(calibration.file_name)
+
+'''
 sequence.file_name = file_name
-
-sequence.range = [7,8]
+while input('Press Y to start Measurement:').lower() != 'y':
+    pass
 sequence.execute()
+sequence.results.save(sequence.file_name)
 
 
+#meas = sequence().load(sequence.file_name)
+#cal = sequence().load(calibration.file_name)
+for i in sequence.range:
+    plt.figure()
+    plt.plot(sequence.results.data['wlsweep-chan'+str(i)][0], 10*np.log10(sequence.results.data['wlsweep-chan'+str(i)][1])-10*np.log10(calibration.results.data['wlsweep-chan'+str(i)][1]))
+    #plt.plot(meas['wlsweep-chan'+str(i)][0], 10*np.log10(meas['wlsweep-chan'+str(i)][1])-10*np.log10(cal['wlsweep-chan'+str(i)][1]))
+    
+    plt.savefig(str(file_name)+ "_wavsweep_calibrated.png")
 
 pass
