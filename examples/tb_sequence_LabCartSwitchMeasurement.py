@@ -52,6 +52,7 @@ pm = PowerMonitor_keysight(rm.open_resource(mf_gpib), chan='1', slot=1)
 mf = lwmm_keysight(rm.open_resource(mf_gpib))
 
 """
+# With Polarization Controller
 calibration = SweepPolarization_SwitchPaths(fls, pol, pm, jds)
 
 calibration.scantime = 5
@@ -85,28 +86,31 @@ calibration.results.save(calibration.file_name)
 """
 
 
+# Without Polarization Controller
 file_name = input('Save Measurement Results as: ')#'2022-08-31-1524_NoPolTest_7-8'
+
 
 sequence = SwitchSequences(tls, pm, mf, jds, verbose=True, saveplot=True, visual=True)
 #sequence = SwitchSequences(tls, pm, pol, mf, jds, verbose=True, saveplot=True, visual=True)
-sequence.range = [5,6,7,8]
-'''
-calibration = sequence
-calibration.file_name = file_name + 'calibration'
+sequence.range = [1,2,3,4,5,6,7,8]
+sequence.pause_before_execution = True
 
-while input('Press Y to start Calibration:').lower() != 'y':
+calibration = sequence
+calibration.file_name = file_name + '_Calibration'
+
+while input('Press Y to start Calibration: ').lower() != 'y':
     pass
 calibration.execute()
 calibration.results.save(calibration.file_name)
 
-'''
+
 sequence.file_name = file_name
-while input('Press Y to start Measurement:').lower() != 'y':
+while input('Press Y to start Measurement: ').lower() != 'y':
     pass
 sequence.execute()
 sequence.results.save(sequence.file_name)
 
-
+'''
 #meas = sequence().load(sequence.file_name)
 #cal = sequence().load(calibration.file_name)
 for i in sequence.range:
@@ -115,5 +119,5 @@ for i in sequence.range:
     #plt.plot(meas['wlsweep-chan'+str(i)][0], 10*np.log10(meas['wlsweep-chan'+str(i)][1])-10*np.log10(cal['wlsweep-chan'+str(i)][1]))
     
     plt.savefig(str(file_name)+ "_wavsweep_calibrated.png")
-
+'''
 pass

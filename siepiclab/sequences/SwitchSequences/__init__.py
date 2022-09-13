@@ -36,6 +36,7 @@ class SwitchSequences(measurements.sequence):
         self.verbose = verbose
         self.visual = visual
         self.saveplot = saveplot
+        self.pause_before_execution = False
 
 
         self.Polarization = False
@@ -78,13 +79,18 @@ class SwitchSequences(measurements.sequence):
         file_name = self.file_name
 
         for i in self.range:
-            
             self.chan = i
             self.file_name = str(file_name) + '-chan' + str(self.chan)
             if self.verbose:
                 print("\n***Switch Changing...***")
             SwitchPath.instructions(self)
             
+            # Quickfix for Manual Polarization Optimization
+            self.tls.SetOutput(True)
+            while input(f'Press Y to start Sequences on Chan: {self.chan}').lower() != 'y':
+                pass
+            self.tls.SetOutput(False)
+
             if self.Polarization:
                 if self.verbose:
                     print("\n***Optimizing Polarization...***")
@@ -96,6 +102,8 @@ class SwitchSequences(measurements.sequence):
                 rslts_minT.append(minT)
 
             if self.WLSweep:
+                if self.verbose:
+                    print("\n*** Performing Wavelength Sweep...***")
                 self.seq_wlsweep.file_name = self.file_name
                 self.seq_wlsweep.execute()
                 wavl = self.seq_wlsweep.results.data['rslts_wavl']
