@@ -134,6 +134,9 @@ class SweepPolarization(measurements.sequence):
             plt.tight_layout()
 
             if self.saveplot:
+                # Create Directory specified by self.file_name if it DNE
+                self.results.createDir(self.file_name)
+
                 plt.gcf()
                 plt.savefig(self.file_name + '.png', format='png')
 

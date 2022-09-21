@@ -8,6 +8,7 @@ Mustafa Hammood, SiEPIC Kits, 2022
 from siepiclab import measurements
 import time
 import numpy as np
+from pandas import DataFrame
 
 
 class SweepWavelengthSpectrum(measurements.sequence):
@@ -167,8 +168,17 @@ class SweepWavelengthSpectrum(measurements.sequence):
             plt.tight_layout()
 
             if self.saveplot:
+                self.results.createDir(self.file_name)
                 plt.savefig(str(self.file_name)+ "_wavsweep.png")
                 plt.close()
+                
+                # Save the WLSweep Data to CSV
+                data = {}
+                data.update({f'wavl': rslts_wavl })
+                data.update({f'pwr': np.concatenate(rslts_pwr)})
+                out = DataFrame.from_dict(data)
+                out.to_csv(self.file_name + '.csv', index=False)
+
         if self.verbose:
             print("\n***Sequence executed successfully.***")
 

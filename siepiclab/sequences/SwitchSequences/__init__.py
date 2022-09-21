@@ -15,20 +15,16 @@ from siepiclab import measurements
 
 
 class SwitchSequences(measurements.sequence): 
-    def __init__(self, tls, pm, mf, sw,  verbose=False, visual=False, saveplot=False):
-#    def __init__(self, tls, pm, pol, mf, sw,  verbose=False, visual=False, saveplot=False):
+    def __init__(self, tls, pm, pol, mf, sw,  verbose=False, visual=False, saveplot=False):
         super().__init__(self)
-
-        #SweepWavelengthSpectrum.__init__(self, mf, tls, pm, mode='step')
-
 
         self.tls = tls
         self.pm = pm
-#        self.pol = pol
+        self.pol = pol
         self.mf = mf
         self.jds = sw
 
-        self.instruments.extend([tls, pm, mf, sw])
+        self.instruments.extend([tls, pm, pol, mf, sw])
 
         self.range = [1,2]
         
@@ -39,7 +35,7 @@ class SwitchSequences(measurements.sequence):
         self.pause_before_execution = False
 
 
-        self.Polarization = False
+        self.Polarization = True
         if self.Polarization:
             self.seq_polopt = SweepPolarization(tls, pol, pm)
             self.seq_polopt.optimize = True
@@ -86,14 +82,16 @@ class SwitchSequences(measurements.sequence):
             SwitchPath.instructions(self)
             
             # Quickfix for Manual Polarization Optimization
-            self.tls.SetOutput(True)
-            while input(f'Press Y to start Sequences on Chan: {self.chan}').lower() != 'y':
-                pass
-            self.tls.SetOutput(False)
+            if self.pause_before_execution:
+                self.tls.SetOutput(True)
+                while input(f'Press Y to start Sequences on Chan: {self.chan}').lower() != 'y':
+                    pass
+                self.tls.SetOutput(False)
 
             if self.Polarization:
                 if self.verbose:
                     print("\n***Optimizing Polarization...***")
+                self.seq_polopt.file_name = self.file_name
                 self.seq_polopt.execute()
             
                 maxT = self.seq_polopt.results.data['maxT']
@@ -108,11 +106,15 @@ class SwitchSequences(measurements.sequence):
                 self.seq_wlsweep.execute()
                 wavl = self.seq_wlsweep.results.data['rslts_wavl']
                 pwr  = self.seq_wlsweep.results.data['rslts_pwr']
-                self.results.add('wlsweep' + '-chan' + str(self.chan), [ wavl, pwr  ])
+                self.results.add('wlsweep' + '-chan' + str(self.chan), [ wavl, pwr ])
+                
+               
 
             pass
 
+        # Reset the Filename to it's original after appending 
         self.file_name = file_name
+
         self.results.add('rslts_maxT', rslts_maxT)
         self.results.add('rslts_minT', rslts_minT)
 
