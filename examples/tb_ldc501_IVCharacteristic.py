@@ -13,6 +13,8 @@ With Templates and support from Mustafa Hammood, SiEPIC Kits, 2022
 # %%
 import pandas as pd
 import pyvisa as visa
+
+from datetime import datetime
 from siepiclab.sequences.SetupLDC501 import SetupLDC501
 from siepiclab.drivers.ldc_srs_ldc500 import ldc_srs_ldc500
 from siepiclab.drivers.PowerMonitor_keysight import PowerMonitor_keysight
@@ -20,7 +22,7 @@ rm = visa.ResourceManager()
 
 
 
-if False:
+if True:
     ldc_gpib = 'GPIB0::2::INSTR'
     pm_gpib  = 'GPIB0::20::INSTR'
 else:
@@ -43,9 +45,14 @@ sequence.Imax = 35
 
 sequence.temperature = 20
 
-datadir = '2022-08-29_SHUKSAN-A1'
-sequence.file_name = str(datadir)+f'/2022-08-29_A1_{sequence.temperature}degC_{sequence.Imin}-{sequence.Imax}A-sweep'
 
+chipID = 'SHUKSAN-A1'
+date = datetime.now().strftime("%y-%m-%d_")
+basedir = 'TestData/'
+datadir = basedir + date + chipID
+
+
+sequence.file_name = str(datadir)+ '/'+ str(date) + str(chipID) +f'_{sequence.temperature}degC_{sequence.Imin}-{sequence.Imax}A-sweep'
 sequence.execute()
 
 # Save as a .pkl file:
