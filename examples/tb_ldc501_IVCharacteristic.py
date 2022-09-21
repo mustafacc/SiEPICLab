@@ -46,13 +46,15 @@ sequence.Imax = 35
 sequence.temperature = 20
 
 
-chipID = 'SHUKSAN-A1'
+chipID = 'SHUKSAN-A4'
 date = datetime.now().strftime("%y-%m-%d_")
-basedir = 'TestData/'
+basedir = 'C:/Users/testStation/Desktop/Data/'
 datadir = basedir + date + chipID
 
 
 sequence.file_name = str(datadir)+ '/'+ str(date) + str(chipID) +f'_{sequence.temperature}degC_{sequence.Imin}-{sequence.Imax}A-sweep'
+
+# %% 
 sequence.execute()
 
 # Save as a .pkl file:
