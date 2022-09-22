@@ -42,11 +42,15 @@ sequence.saveplot = True
 sequence.numPts = 35
 sequence.Imin = 1
 sequence.Imax = 35
+sequence.numPts = 20
+sequence.Imin = 36
+sequence.Imax = 55
+
 
 sequence.temperature = 20
 
 
-chipID = 'SHUKSAN-A4'
+chipID = 'SHUKSAN-A6_postclad_55mA'
 date = datetime.now().strftime("%y-%m-%d_")
 basedir = 'C:/Users/testStation/Desktop/Data/'
 datadir = basedir + date + chipID
