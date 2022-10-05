@@ -8,13 +8,23 @@ Davin Birdi, UBC Photonics
 With Templates from:
 Mustafa Hammood, SiEPIC Kits, 2022
 """
-from SweepPolarization import SweepPolarization
-from SweepWavelengthSpectrum import SweepWavelengthSpectrum
-from SwitchPath import SwitchPath
+
+from siepiclab.sequences.SweepPolarization import SweepPolarization
+from siepiclab.sequences.SweepWavelengthSpectrum import SweepWavelengthSpectrum
+from siepiclab.sequences.SwitchPath import SwitchPath
 from siepiclab import measurements
 
 
-class SwitchSequences(measurements.sequence): 
+class SwitchSequences(measurements.sequence):
+    """
+    Switch Sequences:
+    -----------------
+    Polarization Optimization:
+        
+    Wavelength Sweep:
+    - 
+
+    """ 
     def __init__(self, tls, pm, pol, mf, sw,  verbose=False, visual=False, saveplot=False):
         super().__init__(self)
 
