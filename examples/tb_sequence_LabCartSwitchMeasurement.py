@@ -10,7 +10,6 @@ Mustafa Hammood, SiEPIC Kits, 2022
 """
 # %%
 import pyvisa as visa
-from measurements import sequence
 
 from siepiclab.drivers.opticalSwitch_jds import opticalSwitch_jds
 from siepiclab.drivers.PolCtrl_keysight import PolCtrl_keysight
@@ -32,7 +31,7 @@ rm = visa.ResourceManager()
 print(rm.list_resources())
 # %% instruments definition
 
-if False:
+if True:
     switch_gpib = 'GPIB0::7::INSTR'
     mf_gpib = 'GPIB0::20::INSTR'
     pol_gpib = 'GPIB0::8::INSTR'
@@ -51,24 +50,26 @@ mf = lwmm_keysight(rm.open_resource(mf_gpib))
 
 
 
-chipID = 'NoChip'
+chipID = 'AEPONYX_W5-C3L6-B'
+#chipID = 'MTPLoopback'
 user = 'dbirdi'
 date = datetime.now().strftime("%Y-%m-%d_")
-basedir = 'TestData/' + date + user + 'FileSystemValidation'
+basedir = '././TestData/AEPONYX/' + date + user + '/'
+#basedir = '././TestData/' + date + user + '/'
 datadir = basedir + chipID
 
 file_name = str(datadir)+ '/'+ str(date) + str(chipID)
 
-
 sequence = SwitchSequences(tls, pm, pol, mf, jds, verbose=True, saveplot=True, visual=True)
-sequence.range = [2,3]
-sequence.seq_polopt.scantime = 5
+sequence.range = [4,5,7]
+sequence.seq_polopt.scantime = 45
 sequence.WLSweep = True 
 sequence.file_name = file_name
 sequence.results.add('chipID', chipID)
 
+sequence.WLSweep = True
 
-Calibration = True
+Calibration = False
 if Calibration:
     calibration = sequence
     calibration.file_name = file_name + '_Calibration'
