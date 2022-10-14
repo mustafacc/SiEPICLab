@@ -69,6 +69,7 @@ class results:
 
     def __init__(self):
         self.data = dict()
+        self.initdate(self.data)
         return
 
     def add(self, name, data):
@@ -141,6 +142,34 @@ class results:
         with open(str(file_name)+'.pkl', 'rb') as f:
             return pickle.load(f)
 
+    def _initdate(self, dict):
+        """
+        sets Date information to the sequence results in string format
+        
+        Parameters:
+        -----------
+        dict: dictionary
+            The dictionary that the date information is added to
+
+        Returns:
+        --------
+        none
+
+        """
+        dict.update({'date':datetime.now().strftime("%Y-%m-%d_%H:%M")})
+        
+        """InDepth Date Strings"""
+        datedata = {}
+        datedata.update({'year': datetime.now().strftime("%Y")})
+        datedata.update({'month': datetime.now().strftime("%m")})
+        datedata.update({'day': datetime.now().strftime("%d")})
+
+        datedata.update({'hour': datetime.now().strftime("%H")})
+        datedata.update({'minute': datetime.now().strftime("%M")})
+
+        dict.update({'dateinfo': datedata})
+
+
 
 class sequence:
     """Operations sequence abstraction class."""
@@ -151,6 +180,9 @@ class sequence:
         self.saveplot = saveplot
         self.results = results()
         self.instruments = []
+        self.file_name = ''
+        self.reset_after_execution = True
+        
         return
 
     def execute(self):
@@ -167,4 +199,24 @@ class sequence:
         self.instructions()
 
         # reset the experiment state to the initial state
-        self.experiment.SetSettings(settings)
+        if self.reset_after_execution:
+            self.experiment.SetSettings(settings)
+
+
+    """
+    Attributes:
+    -----------
+        file_name : string
+            File name and directory of the file to save. When you update the filename it
+            automatically creates the folder
+
+    """
+    @property
+    def file_name(self):
+        return self._file_name
+
+    @file_name.setter
+    def file_name(self, file_name):
+        self._file_name = file_name
+        self.results.createDir(file_name)
+
