@@ -69,7 +69,6 @@ class results:
 
     def __init__(self):
         self.data = dict()
-        self.initdate(self.data)
         return
 
     def add(self, name, data):
@@ -142,32 +141,6 @@ class results:
         with open(str(file_name)+'.pkl', 'rb') as f:
             return pickle.load(f)
 
-    def _initdate(self, dict):
-        """
-        sets Date information to the sequence results in string format
-        
-        Parameters:
-        -----------
-        dict: dictionary
-            The dictionary that the date information is added to
-
-        Returns:
-        --------
-        none
-
-        """
-        dict.update({'date':datetime.now().strftime("%Y-%m-%d_%H:%M")})
-        
-        """InDepth Date Strings"""
-        datedata = {}
-        datedata.update({'year': datetime.now().strftime("%Y")})
-        datedata.update({'month': datetime.now().strftime("%m")})
-        datedata.update({'day': datetime.now().strftime("%d")})
-
-        datedata.update({'hour': datetime.now().strftime("%H")})
-        datedata.update({'minute': datetime.now().strftime("%M")})
-
-        dict.update({'dateinfo': datedata})
 
 
 
@@ -179,6 +152,7 @@ class sequence:
         self.visual = visual
         self.saveplot = saveplot
         self.results = results()
+        self.initdate(self.results)
         self.instruments = []
         self.file_name = ''
         self.reset_after_execution = True
@@ -219,4 +193,36 @@ class sequence:
     def file_name(self, file_name):
         self._file_name = file_name
         self.results.createDir(file_name)
+
+    def initdate(self, dict, date_data_name='startdate'):
+        """
+        sets Date information to the sequence results in string format
+        
+        Parameters:
+        -----------
+        dict: dictionary
+            The dictionary that the date information is added to
+
+        Returns:
+        --------
+        none
+
+        """
+        if type(date_data_name) != str:
+            raise TypeError("The date_data_name input must be a string")
+        else:
+            pass
+
+        dict.update({'date': datetime.now().strftime("%Y-%m-%d_%H:%M")})
+        
+        """InDepth Date Strings"""
+        datedata = {}
+        datedata.update({'year': datetime.now().strftime("%Y")})
+        datedata.update({'month': datetime.now().strftime("%m")})
+        datedata.update({'day': datetime.now().strftime("%d")})
+
+        datedata.update({'hour': datetime.now().strftime("%H")})
+        datedata.update({'minute': datetime.now().strftime("%M")})
+
+        dict.update({date_data_name: datedata})
 
