@@ -37,6 +37,10 @@ class SwitchSequences(measurements.sequence):
         self.instruments.extend([tls, pm, pol, mf, sw])
 
         self.range = [1,2]
+        self.devlist = {
+            'device1': 1,
+            'device2': 2
+        }
         
         # Initialize all the Options. This can be done better with properties and cycling through a list/dictionary        
         self.verbose = verbose
@@ -84,9 +88,10 @@ class SwitchSequences(measurements.sequence):
 
         file_name = self.file_name
 
-        for i in self.range:
-            self.chan = i
-            self.file_name = str(file_name) + '-chan' + str(self.chan)
+        for device_name, chan in self.devlist.items():
+            self.chan = chan
+            self.dev_name = device_name
+            self.file_name = str(file_name) + '_dev' + str(self.dev_name) + '_chan' + str(self.chan)
             if self.verbose:
                 print("\n***Switch Changing...***")
             SwitchPath.instructions(self)
@@ -100,7 +105,7 @@ class SwitchSequences(measurements.sequence):
 
             if self.Polarization:
                 if self.verbose:
-                    print("\n***Optimizing Polarization...***")
+                    print(f"\n***Optimizing Polarization on device: {self.dev_name}...***")
                 self.seq_polopt.file_name = self.file_name
                 self.seq_polopt.execute()
             
@@ -111,7 +116,7 @@ class SwitchSequences(measurements.sequence):
 
             if self.WLSweep:
                 if self.verbose:
-                    print("\n*** Performing Wavelength Sweep...***")
+                    print(f"\n*** Performing Wavelength Sweep on device: {self.dev_name}...***")
                 self.seq_wlsweep.file_name = self.file_name
                 self.seq_wlsweep.execute()
                 wavl = self.seq_wlsweep.results.data['rslts_wavl']
