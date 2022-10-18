@@ -28,7 +28,7 @@ from datetime import datetime
 
 rm = visa.ResourceManager()
 
-print(rm.list_resources())
+#print(rm.list_resources())
 # %% instruments definition
 
 if True:
@@ -50,7 +50,7 @@ mf = lwmm_keysight(rm.open_resource(mf_gpib))
 
 
 
-chipID = 'AEPONYX_W5-C3L6-B'
+chipID = 'AEPONYX_W5-C3L6-F'
 #chipID = 'MTPLoopback'
 user = 'dbirdi'
 date = datetime.now().strftime("%Y-%m-%d_")
@@ -68,6 +68,13 @@ sequence.file_name = file_name
 sequence.results.add('chipID', chipID)
 
 sequence.WLSweep = True
+
+sequence.devlist = {
+    'dev2-3': 4,
+    'dev4-5': 5,
+    'dev7-12': 7
+}
+
 
 Calibration = False
 if Calibration:
