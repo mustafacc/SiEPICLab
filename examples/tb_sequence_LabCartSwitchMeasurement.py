@@ -49,12 +49,13 @@ mf = lwmm_keysight(rm.open_resource(mf_gpib))
 
 
 
-
-chipID = 'AEPONYX_W5-C3L6-F'
 #chipID = 'MTPLoopback'
+chipID = 'AEPONYX_W5-C3L6-F'
 user = 'dbirdi'
-date = datetime.now().strftime("%Y-%m-%d_")
-basedir = '././TestData/AEPONYX/' + date + user + '/'
+note = ''
+
+date = datetime.now().strftime("%Y-%m-%d")
+basedir = '././TestData/AEPONYX/' + date + '_' + user + '/'
 #basedir = '././TestData/' + date + user + '/'
 datadir = basedir + chipID
 
@@ -66,6 +67,9 @@ sequence.seq_polopt.scantime = 45
 sequence.WLSweep = True 
 sequence.file_name = file_name
 sequence.results.add('chipID', chipID)
+sequence.results.add('user', user)
+sequence.results.add('date', date)
+sequence.results.add('note', note)
 
 sequence.WLSweep = True
 
