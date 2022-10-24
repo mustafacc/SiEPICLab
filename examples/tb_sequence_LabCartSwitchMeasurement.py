@@ -48,7 +48,7 @@ pm = PowerMonitor_keysight(rm.open_resource(mf_gpib), chan='1', slot=1)
 mf = lwmm_keysight(rm.open_resource(mf_gpib))
 
 
-
+# %% Chip MetaData:
 #chipID = 'MTPLoopback'
 chipID = 'AEPONYX_W5-C3L6-F'
 user = 'dbirdi'
@@ -79,7 +79,7 @@ sequence.devlist = {
     'dev7-12': 7
 }
 
-
+# %% Experiment Calibration
 Calibration = False
 if Calibration:
     calibration = sequence
@@ -92,6 +92,7 @@ if Calibration:
     calibration.results.save(calibration.file_name)
 
 
+# %% Experiment Measurement
 sequence.file_name = file_name
 while input('Press Y to start Measurement: ').lower() != 'y':
     pass
