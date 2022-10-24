@@ -84,6 +84,14 @@ Calibration = False
 if Calibration:
     calibration = sequence
     calibration.file_name = file_name + '_Calibration'
+    calibration.devlist = {
+        'loopback01-12': 2,
+        'loopback02-11': 3,
+        'loopback03-10': 4,
+        'loopback04-09': 5,
+        'loopback05-08': 6,
+        'loopback06-07': 7,
+    }
 
     # Begin the Calibration & Measurement:
     while input('Press Y to start Calibration: ').lower() != 'y':
