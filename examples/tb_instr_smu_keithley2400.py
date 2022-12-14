@@ -12,7 +12,7 @@ from siepiclab.drivers.smu_keithley2400 import smu_keithley2400
 rm = visa.ResourceManager()
 
 # %% instruments definition
-smu = smu_keithley2400(rm.open_resource('keithley2400'))
+smu = smu_keithley2400(rm.open_resource('keithley_2400'))
 
 # %% routine definition
 sequence = testbench_smu_keithley2400(smu)

@@ -17,6 +17,10 @@ class smu_keithley2400(instruments.instr_VISA):
         Keithley 2400
     """
 
+    def __init__(self, single_chan=True):
+
+        self.single_chan = single_chan  # Flag to set to False in case your unit somehow has 2 channels??
+
     def GetState(self):
         """Return an instance of the instrument."""
         currState = instruments.state()
@@ -27,6 +31,13 @@ class smu_keithley2400(instruments.instr_VISA):
         currState.AddState('volt_lim_a', self.GetVoltageLimit('A'))
         currState.AddState('res_a', self.GetResistance('A'))
 
+        if not self.single_chan:
+            currState.AddState('output_b', self.GetOutput('B'))
+            currState.AddState('volt_b', self.GetVoltage('B'))
+            currState.AddState('curr_b', self.GetCurrent('B'))
+            currState.AddState('curr_lim_b', self.GetCurrentLimit('B'))
+            currState.AddState('volt_lim_b', self.GetVoltageLimit('B'))
+            currState.AddState('res_b', self.GetResistance('B'))
         return currState
 
     def SetState(self, state):
@@ -49,6 +60,13 @@ class smu_keithley2400(instruments.instr_VISA):
         self.SetCurrentLimit(state['curr_lim_a'], 'A', verbose=True)
         self.SetVoltageLimit(state['volt_lim_a'], 'A', verbose=True)
 
+        if not self.single_chan:
+            self.SetOutput(state['output_b'], 'B', verbose=True)
+            self.SetVoltage(state['volt_b'], 'B', verbose=True)
+            self.SetCurrent(state['curr_b'], 'B', verbose=True)
+            self.SetCurrentLimit(state['curr_lim_b'], 'B', verbose=True)
+            self.SetVoltageLimit(state['volt_lim_b'], 'B', verbose=True)
+
     def reset(self, verbose=False):
         """
         Reset the instrument.
@@ -63,62 +81,7 @@ class smu_keithley2400(instruments.instr_VISA):
         if verbose:
             print('Reseting the Keithley Source Measure Unit instrument. . .')
 
-    def SetVoltageMode(self, chan='A', verbose=False, wait=False):
-        """
-        Set the instrument to measure voltage.
-
-        Returns
-        -------
-        None.
-
-        """
-        if chan == 'A':
-            self.addr.write("SOUR1:FUNC CURR")
-            self.addr.write("SOUR1:CURR 0")
-            self.addr.write("CONF:VOLT")
-            self.addr.write("FORM:ELEM VOLT")
-            if wait or verbose:
-                self.wait()
-            if verbose:
-                return(self.addr.query('CONF?'))
-
-    def SetCurrentMode(self, chan='A', verbose=False, wait=False):
-        """
-        Set the instrument to measure current.
-
-        Returns
-        -------
-        None.
-
-        """
-        if chan == 'A':
-            self.addr.write("SOUR1:FUNC VOLT")
-            self.addr.write("SOUR1:VOLT 0")
-            self.addr.write("CONF:CURR")
-            self.addr.write("FORM:ELEM CURR")
-            if wait or verbose:
-                self.wait()
-            if verbose:
-                return(self.addr.query('CONF?'))
-
-    def SetResistanceMode(self, chan='A', verbose=False, wait=False):
-        """
-        Set the instrument to measure resistance.
-
-        Returns
-        -------
-        None.
-
-        """
-        if chan == 'A':
-            self.addr.write("CONF:RES")
-            self.addr.write("FORM:ELEM RES")
-            if wait or verbose:
-                self.wait()
-            if verbose:
-                return(self.addr.query('CONF?'))
-
-    def GetOutput(self, chan='A'):
+    def GetOutput(self, chan):
         """
         Get the state of the input/output channel (turned on or off).
 
@@ -141,8 +104,15 @@ class smu_keithley2400(instruments.instr_VISA):
             except ValueError:
                 status = 0
             return status
+        if chan == 'B':
+            status = int(float(self.addr.query(":OUTP2?")))
+            return status
+        if chan == 'AB':
+            status_a = int(float(self.addr.query(":OUTP1?")))
+            status_b = int(float(self.addr.query(":OUTP2?")))
+            return status_a, status_b
 
-    def SetOutput(self, status, chan='A', verbose=False, wait=False):
+    def SetOutput(self, status, chan, verbose=False, wait=False):
         """
         Set the state of the input/output channel (turned on or off).
 
@@ -172,7 +142,27 @@ class smu_keithley2400(instruments.instr_VISA):
             if verbose:
                 return(self.GetOutput(chan))
 
-    def GetVoltage(self, chan='A'):
+        if chan == 'B':
+            self.addr.write(f":OUTP2 {status}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetOutput(chan))
+
+        if chan == 'AB':
+            self.addr.write(f":OUTP1 {status}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetOutput('A'))
+
+            self.addr.write(f":OUTP2 {status}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetOutput('B'))
+
+    def GetVoltage(self, chan):
         """
         Get the channel voltage.
 
@@ -188,11 +178,17 @@ class smu_keithley2400(instruments.instr_VISA):
 
         """
         if chan == 'A':
-            self.SetVoltageMode(chan)
-            volt = float(self.addr.query("READ?"))
+            volt = float(self.addr.query("SENS1:VOLT?"))
             return volt
+        if chan == 'B':
+            volt = float(self.addr.query("SENS2:VOLT?"))
+            return volt
+        if chan == 'AB':
+            volt_a = float(self.addr.query("SENS1:VOLT?"))
+            volt_b = float(self.addr.query("SENS2:VOLT?"))
+            return volt_a, volt_b
 
-    def SetVoltage(self, volt, chan='A', verbose=False, wait=False):
+    def SetVoltage(self, volt, chan, verbose=False, wait=False):
         """
         Set the voltage of the output channel.
 
@@ -220,7 +216,27 @@ class smu_keithley2400(instruments.instr_VISA):
             if verbose:
                 return(self.GetVoltage(chan))
 
-    def GetCurrent(self, chan='A'):
+        if chan == 'B':
+            self.addr.write(f"SOUR2:VOLT {volt}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetVoltage(chan))
+
+        if chan == 'AB':
+            self.addr.write(f"SOUR1:VOLT {volt}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetVoltage('A'))
+
+            self.addr.write(f"SOUR2:VOLT {volt}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetVoltage('B'))
+
+    def GetCurrent(self, chan):
         """
         Get the channel current.
 
@@ -236,11 +252,17 @@ class smu_keithley2400(instruments.instr_VISA):
 
         """
         if chan == 'A':
-            self.SetVoltageMode(chan)
-            curr = float(self.addr.query("READ?"))
+            curr = float(self.addr.query("SENS1:CURR?"))
             return curr
+        if chan == 'B':
+            curr = float(self.addr.query("SENS2:CURR?"))
+            return curr
+        if chan == 'AB':
+            curr_a = float(self.addr.query("SENS1:CURR?"))
+            curr_b = float(self.addr.query("SENS2:CURR?"))
+            return curr_a, curr_b
 
-    def SetCurrent(self, curr, chan='A', verbose=False, wait=False):
+    def SetCurrent(self, curr, chan, verbose=False, wait=False):
         """
         Set the current of the output channel.
 
@@ -268,7 +290,27 @@ class smu_keithley2400(instruments.instr_VISA):
             if verbose:
                 return(self.GetCurrent(chan))
 
-    def GetCurrentLimit(self, chan='A'):
+        if chan == 'B':
+            self.addr.write(f"SOUR2:CURR {curr}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetCurrent(chan))
+
+        if chan == 'AB':
+            self.addr.write(f"SOUR1:CURR {curr}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetCurrent('A'))
+
+            self.addr.write(f"SOUR2:CURR {curr}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetCurrent('B'))
+
+    def GetCurrentLimit(self, chan):
         """
         Get the channel current compliance (limit) setting.
 
@@ -286,8 +328,15 @@ class smu_keithley2400(instruments.instr_VISA):
         if chan == 'A':
             curr_lim = float(self.addr.query("SENS1:CURR:PROT?"))
             return curr_lim
+        if chan == 'B':
+            curr_lim = float(self.addr.query("SENS2:CURR:PROT?"))
+            return curr_lim
+        if chan == 'AB':
+            curr_lim_a = float(self.addr.query("SENS1:CURR:PROT?"))
+            curr_lim_b = float(self.addr.query("SENS2:CURR:PROT?"))
+            return curr_lim_a, curr_lim_b
 
-    def SetCurrentLimit(self, curr_lim, chan='A', verbose=False, wait=False):
+    def SetCurrentLimit(self, curr_lim, chan, verbose=False, wait=False):
         """
         Set the current compliance (limit) of the output channel.
 
@@ -315,7 +364,27 @@ class smu_keithley2400(instruments.instr_VISA):
             if verbose:
                 return(self.GetCurrentLimit('A'))
 
-    def GetVoltageLimit(self, chan='A'):
+        if chan == 'B':
+            self.addr.write(f"SENS2:CURR:PROT {curr_lim}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetCurrentLimit('B'))
+
+        if chan == 'AB':
+            self.addr.write(f"SENS1:CURR:PROT {curr_lim}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetCurrentLimit('A'))
+
+            self.addr.write(f"SENS2:CURR:PROT {curr_lim}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetCurrentLimit('B'))
+
+    def GetVoltageLimit(self, chan):
         """
         Get the channel voltage compliance (limit) setting.
 
@@ -333,8 +402,15 @@ class smu_keithley2400(instruments.instr_VISA):
         if chan == 'A':
             volt_lim = float(self.addr.query("SENS1:VOLT:PROT?"))
             return volt_lim
+        if chan == 'B':
+            volt_lim = float(self.addr.query("SENS2:VOLT:PROT?"))
+            return volt_lim
+        if chan == 'AB':
+            volt_lim_a = float(self.addr.query("SENS1:VOLT:PROT?"))
+            volt_lim_b = float(self.addr.query("SENS2:VOLT:PROT?"))
+            return volt_lim_a, volt_lim_b
 
-    def SetVoltageLimit(self, volt_lim, chan='A', verbose=False, wait=False):
+    def SetVoltageLimit(self, volt_lim, chan, verbose=False, wait=False):
         """
         Set the voltage compliance (limit) of the output channel.
 
@@ -362,7 +438,27 @@ class smu_keithley2400(instruments.instr_VISA):
             if verbose:
                 return(self.GetVoltageLimit('A'))
 
-    def GetResistance(self, chan='A'):
+        if chan == 'B':
+            self.addr.write(f"SENS2:VOLT:PROT {volt_lim}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetVoltageLimit('B'))
+
+        if chan == 'AB':
+            self.addr.write(f"SENS1:VOLT:PROT {volt_lim}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetVoltageLimit('A'))
+
+            self.addr.write(f"SENS2:VOLT:PROT {volt_lim}")
+            if wait or verbose:
+                self.wait()
+            if verbose:
+                return(self.GetVoltageLimit('B'))
+
+    def GetResistance(self, chan):
         """
         Get the channel resistance.
 
@@ -378,6 +474,12 @@ class smu_keithley2400(instruments.instr_VISA):
 
         """
         if chan == 'A':
-            self.SetResistanceMode(chan)
-            res = float(self.addr.query("READ?"))
+            res = float(self.addr.query("SENS1:RES?"))
             return res
+        if chan == 'B':
+            res = float(self.addr.query("SENS2:RES?"))
+            return res
+        if chan == 'AB':
+            res_a = float(self.addr.query("SENS1:RES?"))
+            res_b = float(self.addr.query("SENS2:RES?"))
+            return res_a, res_b
