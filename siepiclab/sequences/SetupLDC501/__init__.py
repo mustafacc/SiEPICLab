@@ -35,17 +35,18 @@ class SetupLDC501(measurements.sequence):
         self.instruments = [ldc, pm]
         self.experiment = measurements.lab_setup(self.instruments)
 
-
-
-    def InstrSetting(self):
-        
-        # TEC Settings:
+         # TEC Settings:
         self.ldc.tecMode('CT')
         self.ldc.SetTemperature(self.temperature)
     
         # Power Monitor Settings:
         self.pm.SetWavl(1270)
         self.pm.SetPwrUnit('mw')
+
+
+
+    def InstrSetting(self):
+        pass
 
 
     def instructions(self):
@@ -69,9 +70,10 @@ class SetupLDC501(measurements.sequence):
         if self.verbose:
             print('***Activating LD and Beginning Current Sweep...***')
         self.ldc.LDON()
+        sleep(5)
         for ii, II in enumerate(currentsSet):
             self.ldc.SetLDcurrent(II)
-            sleep(2)
+            sleep(1)
             powers = np.append(powers,self.pm.GetPwr())
             powersdbm = np.append(powersdbm,self.pm.GetPwr(True))
             currents = np.append(currents,self.ldc.GetLDcurrent())

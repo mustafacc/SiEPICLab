@@ -42,22 +42,22 @@ sequence.saveplot = True
 sequence.numPts = 35
 sequence.Imin = 1
 sequence.Imax = 35
-sequence.numPts = 20
-sequence.Imin = 36
-sequence.Imax = 55
 
 
-sequence.temperature = 20
+sequence.temperature = 25
+ # Power Monitor Settings:
+sequence.pm.SetWavl(1560)
 
-
-chipID = 'SHUKSAN-A6_postclad_55mA'
+ 
+chipID = 'HHI_Sample01'
 date = datetime.now().strftime("%y-%m-%d_")
-basedir = 'C:/Users/testStation/Desktop/Data/'
+basedir = 'C:\\Users\\testStation\\Desktop\\'
 datadir = basedir + date + chipID
 
 
-sequence.file_name = str(datadir)+ '/'+ str(date) + str(chipID) +f'_{sequence.temperature}degC_{sequence.Imin}-{sequence.Imax}A-sweep'
+sequence.file_name = str(datadir)+ '/'+ str(date) + str(chipID) +f'_{sequence.temperature}degC_{sequence.Imin}-{sequence.Imax}mA'
 
+sequence.ldc.tecON()
 # %% 
 sequence.execute()
 
@@ -71,7 +71,7 @@ data3 = sequence.results.data['powers']
 data4 = sequence.results.data['powersdbm']
 
 df = pd.DataFrame({"currents": data1, 'voltages':data2, 'powers':data3, 'powersdbm':data4})
-df.to_csv(sequence.file_name, sep=',',index=False)
+df.to_csv(sequence.file_name +".csv", sep=',',index=False)
 
 pass
 

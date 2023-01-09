@@ -48,7 +48,7 @@ class SwitchSequences(measurements.sequence):
         self.saveplot = saveplot
         self.pause_before_execution = False
 
-
+        # Set to True to include Polarization Optimization, False to Exclude
         self.Polarization = True
         if self.Polarization:
             self.seq_polopt = SweepPolarization(tls, pol, pm)
@@ -58,6 +58,7 @@ class SwitchSequences(measurements.sequence):
             self.seq_polopt.saveplot = self.saveplot
             self.seq_polopt.reset_after_execution = False
 
+        # Set to True to include Wavelength, False to Exclude
         self.WLSweep = True
         if self.WLSweep:
             self.seq_wlsweep = SweepWavelengthSpectrum(mf, tls, pm, mode='step')
