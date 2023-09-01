@@ -51,8 +51,8 @@ sequence.pm.SetWavl(1270)
  
 chipID = 'DPLAB_Test_MACOM1270'
 date = datetime.now().strftime("%y-%m-%d_")
-basedir = 'C:\\Users\\testStation\\Desktop\\'
-basedir = '/Volumes/Shared/QMI/CartSoftware/SiEPICLab/siepiclab/'
+basedir = 'C:\\!Data'
+#basedir = '/Volumes/Shared/QMI/CartSoftware/SiEPICLab/siepiclab/'
 datadir = basedir + date + chipID
 
 

@@ -60,8 +60,9 @@ class osa_agilent(instruments.instr_VISA):
     def SetWavlSpan(self, span):
         self.write(f"sens:wav:span {span}nm")
 
-    def setPoints(self, points):
-        a.query('trac:poin? tra'))
+    # LowPriorityTodo
+    # def setPoints(self, points):
+    #    a.query('trac:poin? tra'))
 
     """
     TRACE Subsystem Commands:
