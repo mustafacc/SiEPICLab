@@ -7,6 +7,7 @@ Mustafa Hammood, SiEPIC Kits, 2022
 """
 from siepiclab import measurements
 
+from drivers.osa_agilent import osa_agilent
 
 class OSA_scan(measurements.sequence):
 
@@ -15,6 +16,7 @@ class OSA_scan(measurements.sequence):
         self.osa = osa
 
     def InstrSetting(self):
+        self.osa.
         pass
 
     def instructions(self):

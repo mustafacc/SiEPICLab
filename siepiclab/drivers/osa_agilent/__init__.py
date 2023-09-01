@@ -60,6 +60,9 @@ class osa_agilent(instruments.instr_VISA):
     def SetWavlSpan(self, span):
         self.write(f"sens:wav:span {span}nm")
 
+    def setPoints(self, points):
+        a.query('trac:poin? tra'))
+
     """
     TRACE Subsystem Commands:
     A TRACe or a DATA area is a named entity stored in instrument memory.

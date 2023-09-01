@@ -14,6 +14,7 @@ Davin Birdi, 2023
 # %%
 import pandas as pd
 import pyvisa as visa
+import matplotlib.pyplot as plt
 
 from datetime import datetime
 from siepiclab.sequences.SetupLDC501 import SetupLDC501
@@ -39,24 +40,33 @@ print(ldc.identify())
 
 
 # %%
+def simple_test():
+    ldc.LDON()
+    ldc.SetLDcurrent(20)
 
-ldc.LDON()
-ldc.SetLDcurrent(20)
+    osa.SingleSweep()
+
+    osa.SetWavlCenter(1270)
+    print(osa.WavlCenter())
+
+    osa.SetWavlSpan(1)
+    print(osa.WavlSpan())
+
+    numpts = osa.getTracePoints()
+    print(numpts)
+    osa.SingleSweep()
+    wavl, pwr = osa.getTrace()
+    plt.plot(wavl, pwr)
+
+simple_test()
 # %%
-osa.SingleSweep()
+ldc.GetTemperature()
+ldc.SetTemperature(25)
+ldc.tecON()
+
+
 
 # %%
-osa.SetWavlCenter(1270)
-print(osa.WavlCenter())
-
-osa.SetWavlSpan(1)
-print(osa.WavlSpan())
-
-numpts = osa.getTracePoints()
-
-print(numpts)
-# %%
-import matplotlib.pyplot as plt
 
 
 biases = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
@@ -64,7 +74,7 @@ biases = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
 wavl = []
 pwr = []
 
-osa.SetWavlSpan(3)
+osa.SetWavlSpan(1)
 
 ldc.LDON()
 ldc.SetLDcurrent(0)
@@ -90,7 +100,7 @@ for i in range(0, len(biases)):
 
 
 
-
-# %%
-type(pwr)
-# %%
+## Turn off.
+ldc.SetLDcurrent(0)
+ldc.LDOFF()
+ldc.tecOFF()

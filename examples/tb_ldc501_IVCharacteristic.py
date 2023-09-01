@@ -73,12 +73,3 @@ data4 = sequence.results.data['powersdbm']
 
 df = pd.DataFrame({"currents": data1, 'voltages':data2, 'powers':data3, 'powersdbm':data4})
 df.to_csv(sequence.file_name +".csv", sep=',',index=False)
-
-pass
-
-
-# %%
-ldc.LDON()
-ldc.SetLDcurrent(15)
-# %%
-ldc.LDOFF
