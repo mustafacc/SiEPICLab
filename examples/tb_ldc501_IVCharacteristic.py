@@ -78,3 +78,7 @@ pass
 
 
 # %%
+ldc.LDON()
+ldc.SetLDcurrent(15)
+# %%
+ldc.LDOFF
