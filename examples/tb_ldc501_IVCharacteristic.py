@@ -23,8 +23,8 @@ rm = visa.ResourceManager()
 
 
 if True:
-    ldc_gpib = 'GPIB0::2::INSTR'
-    pm_gpib  = 'GPIB0::20::INSTR'
+    ldc_gpib = 'visa://192.168.137.1/GPIB0::2::INSTR'
+    pm_gpib  = 'visa://192.168.137.1/GPIB0::20::INSTR'
 else:
     ldc_gpib = 'visa://10.2.137.163/GPIB0::2::INSTR'
     pm_gpib = 'visa://10.2.137.163/GPIB0::20::INSTR'
@@ -39,25 +39,26 @@ sequence = SetupLDC501(ldc, pm)
 sequence.verbose = True
 sequence.visual = True
 sequence.saveplot = True
-sequence.numPts = 35
-sequence.Imin = 1
+sequence.numPts = 36
+sequence.Imin = 0
 sequence.Imax = 35
 
 
 sequence.temperature = 25
  # Power Monitor Settings:
-sequence.pm.SetWavl(1560)
+sequence.pm.SetWavl(1270)
 
  
-chipID = 'HHI_Sample01'
+chipID = 'DPLAB_Test_MACOM1270'
 date = datetime.now().strftime("%y-%m-%d_")
 basedir = 'C:\\Users\\testStation\\Desktop\\'
+basedir = '/Volumes/Shared/QMI/CartSoftware/SiEPICLab/siepiclab/'
 datadir = basedir + date + chipID
 
 
 sequence.file_name = str(datadir)+ '/'+ str(date) + str(chipID) +f'_{sequence.temperature}degC_{sequence.Imin}-{sequence.Imax}mA'
 
-sequence.ldc.tecON()
+#sequence.ldc.tecON()
 # %% 
 sequence.execute()
 
