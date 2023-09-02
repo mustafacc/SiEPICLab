@@ -98,7 +98,7 @@ for bias in biases:
 
 # Get the Wavelength Once
 data['wavl'] = wl
-date = data.set_index('wavl')
+data = data.set_index('wavl')
 
 ## Turn off.
 ldc.SetLDcurrent(0)
@@ -109,7 +109,8 @@ ldc.tecOFF()
 
 plt.plot(data)
 dirname = '/Volumes/Shared/QMI/CartSoftware/'
-date = datetime.now().strftime("%Y-%m-%d")
+dirname = 'C:\\!Data\\'
+date = datetime.now().strftime("%Y-%m-%d_")
 filename = 'osa_currentsweep.csv'
 
 savename = dirname + date + filename
@@ -118,6 +119,6 @@ data.to_csv(savename)
 
 
 # %% Verify Reading the same File:
-df = pd.read_csv('/Volumes/Shared/QMI/CartSoftware/2023-09-01osa_currentsweep.csv', index_col='wavl')
+df = pd.read_csv(savename, index_col='wavl')
 df
 # %%
