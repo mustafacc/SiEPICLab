@@ -13,6 +13,7 @@ Davin Birdi, 2023
 """
 # %%
 import pandas as pd
+import numpy as np
 import pyvisa as visa
 import matplotlib.pyplot as plt
 
@@ -58,21 +59,22 @@ def simple_test():
     wavl, pwr = osa.getTrace()
     plt.plot(wavl, pwr)
 
+    # Notice the plot plots before results are shown.
+
 simple_test()
-# %%
+# %% LDC Current Bias Scan
 ldc.GetTemperature()
 ldc.SetTemperature(25)
 ldc.tecON()
 
 
 
-# %%
-
-
-biases = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+biases = np.array([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
 
 wavl = []
 pwr = []
+
+data = pd.DataFrame()
 
 osa.SetWavlSpan(1)
 
@@ -91,16 +93,31 @@ for bias in biases:
     # Gets the trace data
     wl, p = osa.getTrace()
     
-    # Adds it to a list
-    wavl.append(wl)
-    pwr.append(p)
+    # Adds Power Data
+    data[f'{bias:0.2f}'] = p
 
-for i in range(0, len(biases)):
-    plt.plot(wavl[i], pwr[i])
-
-
+# Get the Wavelength Once
+data['wavl'] = wl
+date = data.set_index('wavl')
 
 ## Turn off.
 ldc.SetLDcurrent(0)
 ldc.LDOFF()
 ldc.tecOFF()
+
+# %% Plot and Save to CSV
+
+plt.plot(data)
+dirname = '/Volumes/Shared/QMI/CartSoftware/'
+date = datetime.now().strftime("%Y-%m-%d")
+filename = 'osa_currentsweep.csv'
+
+savename = dirname + date + filename
+
+data.to_csv(savename)
+
+
+# %% Verify Reading the same File:
+df = pd.read_csv('/Volumes/Shared/QMI/CartSoftware/2023-09-01osa_currentsweep.csv', index_col='wavl')
+df
+# %%
