@@ -96,7 +96,46 @@ class results:
         None.
 
         """
-        self.data[str(name)] = data
+        try:
+            test = self.data[str(name)]
+            raise KeyError('Key in results data dictionary already exists. \
+                Use another key name to avoid inadvertently overwriting    \
+                existing data of the same key name or use update() method.')
+        except KeyError:
+            self.data[str(name)] = data
+
+    def update(self, name, data):
+        """
+        Update data already in results dataset.
+
+        Example
+        ----------
+            voltage = [1,2,3] \n
+            current = [1,2,3] \n
+            results = siepiclab.measurements.results() \n
+            results.add('voltage', voltage1) \n
+            results.add('voltage', voltage2) \n
+            >> Accidently overwrites voltage (no explicit intent). \n
+            results.update('voltage', voltage2) \n
+            >> Intentional overwriting of data. \n
+
+        Parameters
+        ----------
+        name : string
+            Name of the data to add.
+        data : Any
+            Content of the data.
+
+        Returns
+        -------
+        None.
+
+        """
+        try:
+            self.data[str(name)] = data
+        except KeyError:
+            raise KeyError('Key does not already exist in data dictionary. \
+                Use the add() method when creating new entries.')
 
     def save(self, file_name=None, timestamp=False):
         """

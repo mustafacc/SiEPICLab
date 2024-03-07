@@ -12,9 +12,13 @@ from siepiclab.drivers.smu_keithley import smu_keithley
 rm = visa.ResourceManager()
 
 # %% instruments definition
-smu = smu_keithley(rm.open_resource('keithley_2602'))
+smu = smu_keithley(rm.open_resource('GPIB2::10::INSTR'))
+
 
 # %% routine definition
 sequence = testbench_smu_keithley(smu)
 sequence.verbose = True
 sequence.execute()
+
+#%%
+smu.SweepIV_voltage('a')
