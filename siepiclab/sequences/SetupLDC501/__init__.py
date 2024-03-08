@@ -40,8 +40,8 @@ class SetupLDC501(measurements.sequence):
         self.ldc.SetTemperature(self.temperature)
     
         # Power Monitor Settings:
-        self.pm.SetWavl(1270)
-        self.pm.SetPwrUnit('mw')
+    
+      
 
 
 

@@ -27,7 +27,7 @@ sequence.wavl_stop = 1375  # nm
 sequence.wavl_pts = 401  # number of points
 sequence.pwr = 1  # mW
 sequence.sweep_speed = 20  # nm/s
-sequence.upper_limit = -10  # maximum power expected (dbm, -100: existing setting.)
+sequence.upper_limit = 0  # maximum power expected (dbm, -100: existing setting.)
 sequence.verbose = True  # turn on verbose logging mode
 sequence.visual = True  # visualize the wavelength sweep results
 
