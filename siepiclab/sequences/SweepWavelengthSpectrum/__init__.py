@@ -50,11 +50,11 @@ class SweepWavelengthSpectrum(measurements.sequence):
         if mode == 'step':
             self.wavl_start = 1524  # nm
             self.wavl_stop = 1575  # nm
-            self.wavl_pts = 101  # number of points
+            self.wavl_pts = 201  # number of points
         else:
             self.wavl_start = 1280  # nm
             self.wavl_stop = 1370  # nm
-            self.wavl_pts = 601  # number of points
+            self.wavl_pts = 201  # number of points
 
         self.instruments.extend([mf, tls] + self.pm)
         self.experiment = measurements.lab_setup(self.instruments)
@@ -68,7 +68,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
 
         # set the wavelength and power of the laser and turn on
         self.tls.SetWavl(self.wavl)
-        self.tls.SetPwrUnit('dBm')
+        #self.tls.SetPwrUnit('dBm')
         self.tls.SetPwr(self.pwr)
         self.tls.SetPwrUnit('mW')
         self.tls.SetOutput(True)
@@ -99,7 +99,7 @@ class SweepWavelengthSpectrum(measurements.sequence):
         for idx, p in enumerate(self.pm):
             p.SetAutoRanging(0)  # disable auto ranging
             p.SetPwrRange(self.upper_limit)
-            p.SetPwrUnit('dBm')
+            #p.SetPwrUnit('dBm')
             p.SetPwrLoggingPar(self.wavl_pts, 0.5*self.sweep_step/self.sweep_speed)
 
         self.tls.SetWavlLoggingStatus(True)
