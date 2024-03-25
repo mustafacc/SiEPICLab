@@ -83,7 +83,7 @@ ldc.SetLDcurrent(2)
 #osa.SetWavlCenter(1550)
 #osa.SetWavlSpan(10)
 temperatures = 25#np.array([20, 25, 30, 35, 40, 45])
-biases = np.array([0, 25, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500])
+biases = np.array([50, 100, 150])
 wavl = []
 pwr = []
 data = pd.DataFrame()
@@ -95,7 +95,7 @@ for bias in biases:
         ldc.SetLDcurrent(bias)
         sleep(10)
         osa.SingleSweep()
-        sleep(60)
+        sleep(220)
         wavl, pwr = osa.getTrace()
         plt.plot(wavl, pwr)
         data[f'{bias:0.2f}'] = pwr
@@ -131,14 +131,13 @@ ldc.LDOFF()
 plt.plot(data)
 
 
-chipID = 'DPLAB_LightIC_SOA_V4'
-measID = '-10dBm_PortA_1540nm_measPortB_OSA'
-measID = '-10dBm_patch_cable'
+chipID = 'NRC_FP_Laser_Si_Submount'
+measID = 'Test'
 date = datetime.now().strftime("%Y-%m-%d_%H-%M_")
 basedir = 'C:\\!Data/'
 datadir = basedir + chipID
 
-savename = str(datadir) + "\\patch_cable\\" + str(date) + str(measID) 
+savename = str(datadir) + str(date) + str(measID) 
 
 data.to_csv(savename +".csv")
 

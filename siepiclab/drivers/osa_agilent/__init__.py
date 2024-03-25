@@ -37,7 +37,10 @@ class osa_agilent(instruments.instr_VISA):
         self.write('syst:comm:gpib:buff on')
         self.write('sens:swe:time:auto on')
         timeout = self.GetSweepTime()+timeout_safety
+        # Runs the Sweep:
         self.addr.write('init:imm')
+        # Ensures no other GPIB Commands are run until the previous commands are finished.
+        self.addr.write('wai')
         time.sleep(timeout)
 
 

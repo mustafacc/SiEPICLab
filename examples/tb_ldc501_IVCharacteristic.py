@@ -48,8 +48,8 @@ sequence.verbose = True
 sequence.visual = True
 sequence.saveplot = True
 sequence.Imin = 0   #mA
-sequence.Imax = 90 #mA
-sequence.numPts = 90 + 1
+sequence.Imax = 10 #mA
+sequence.numPts = 10 + 1
 sequence.temperature = 25 # Degrees C
 
 
@@ -61,13 +61,13 @@ sequence.pm.SetPwrRange(0)
 
 
  
-chipID = 'DPLAB_ARL_AR_CL30'
-measID = '25LIV_CL30_25dB_att_'
+chipID = 'Testing'
+measID = '10dB_att'
 date = datetime.now().strftime("%Y-%m-%d_%H-%M_")
 basedir = 'C:\\!Data/'
 #basedir = '/Volumes/Shared/QMI/CartSoftware/SiEPICLab/siepiclab/'
 datadir = basedir + chipID
-
+sequence.measID = measID
 
 sequence.file_name = str(datadir)+ '/'+ str(date) + str(measID) +f'_{sequence.temperature}degC_{sequence.Imin}-{sequence.Imax}mA'
 
