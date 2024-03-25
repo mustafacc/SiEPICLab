@@ -40,8 +40,9 @@ class SetupLDC501(measurements.sequence):
         self.ldc.SetTemperature(self.temperature)
     
         # Power Monitor Settings:
-        self.pm.SetWavl(1270)
-        self.pm.SetPwrUnit('mw')
+    
+        
+      
 
 
 
@@ -94,20 +95,23 @@ class SetupLDC501(measurements.sequence):
         #%% 
         if self.visual or self.saveplot == True:
             #filename=(datetime.now().strftime('%Y%m%d%H%M%S')+'_Isweep')  
-            file_name = self.file_name.rsplit('/')[0]
-
+            #file_name = self.file_name.rsplit('\\')[0]
+            
             plt.close(1)
             plt.figure(1, figsize=(11, 6))
             plt.plot(currents,voltages,'.k', label = 'Data')
             plt.ylabel('Voltage (V)')
             plt.xlabel('Current (mA)')
-            title1 = str(file_name) + 'LDC Current Sweep Sequence\n'
+
+            title1 = str(self.measID) + 'LDC Current Sweep Sequence\n'
+
             title2 = f'Voltage vs. Current Sweep from {self.Imin} to {self.Imax}' + '\n'
             title3 = f'Temperature = {int(self.temperature)} degC'
             plt.title(title1+title2+title3) 
             plt.tight_layout()   
             if self.saveplot:
-                plt.savefig(self.file_name+'_IV.png')
+                plt.savefig(self.measID+'_IV.png')
+
             if not(self.visual):
                 plt.close(1)
             
@@ -117,13 +121,14 @@ class SetupLDC501(measurements.sequence):
             plt.plot(currents,powers,'.k', label = 'Data')
             plt.ylabel('Power (mW)')
             plt.xlabel('Current (mA)')
-            title1 = str(self.file_name) + 'LDC Current Sweep Sequence\n'
+            title1 = str(self.measID) + 'LDC Current Sweep Sequence\n'
             title2 = f'Optical Power vs. Current Sweep from {self.Imin} to {self.Imax}\n'
             title3 = f'Temperature = {int(self.temperature)} degC'
             plt.title(title1+title2+title3) 
             plt.tight_layout()   
             if self.saveplot:
-                plt.savefig(self.file_name+'_LI(mW).png')
+                plt.savefig(self.measID+'_LI(mW).png')
+
             if not(self.visual):
                 plt.close(2)
                 
@@ -133,13 +138,15 @@ class SetupLDC501(measurements.sequence):
             plt.plot(currents,powersdbm,'.k', label = 'Data')
             plt.ylabel('Power (dBm)')
             plt.xlabel('Current (mA)')
-            title1 = str(file_name) + 'LDC Current Sweep Sequence\n'
+
+            title1 = str(self.measID) + 'LDC Current Sweep Sequence\n'
+
             title2 = f'Optical Power vs. Current Sweep from {self.Imin} to {self.Imax}\n'
             title3 = f'Temperature = {int(self.temperature)} degC'
             plt.title(title1+title2+title3)
             plt.tight_layout()    
             if self.saveplot:
-                plt.savefig(self.file_name+'_LI(db).png')
+                plt.savefig(self.measID+'_LI(db).png')
             if not(self.visual):
                 plt.close(3)
 

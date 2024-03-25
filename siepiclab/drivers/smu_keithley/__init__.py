@@ -70,10 +70,35 @@ class smu_keithley(instruments.instr_VISA):
         self.addr.write("smub.reset()")
         print('Reseting the Keithley Source Measure Unit instrument. . .')
 
+    def GetOutputMode(self, chan):
+        chan = chan.lower()
+        mode = int(float(self.addr.query(f'print(smu{chan}.source.func)').strip()))
+        if mode == 1:
+            print(f'Output mode of channel {chan.upper()} is Voltage')
+        else:
+            print(f'Output mode of channel {chan.upper()} is Current')
+        return mode
+
+    def SetOutputMode(self, chan, mode='volt', verbose=False, wait=False):
+        chan = chan.lower()
+
+        if mode == 'volt':
+            self.SetVoltage(0., chan)
+        elif mode == 'curr':
+            self.SetCurrent(0., chan)
+        else:
+            print("ERR: Invalid mode selection. Possible inputs = ['volt', 'curr']")
+        if wait or verbose:
+            self.wait()
+        if verbose:
+            return(self.GetOutputMode(chan))            
+        return
+
     def GetOutput(self, chan):
         if chan == 'A':
             try:
-                status = int(float(self.addr.query("print(smua.source.output)")))
+                status = int(float(self.addr.query(
+                    "print(smua.source.output)")))
             except ValueError:
                 status = 0
             return status
@@ -327,3 +352,200 @@ class smu_keithley(instruments.instr_VISA):
             res_a = float(self.addr.query("print(smua.measure.r())"))
             res_b = float(self.addr.query("print(smub.measure.r())"))
             return res_a, res_b
+
+    def sweep_2CH_VV(self, chan1, chan2, volt_start=0, volt_stop=5, volt_num=10, visualize=True):
+        """Set a voltage on CH1 and read curr and voltage on CH1, voltage on CH2."""
+        import numpy as np
+        import time
+        import matplotlib.pyplot as plt
+        v_arr = np.linspace(volt_start, volt_stop, volt_num)
+        chan1 = chan1.upper()
+        chan2 = chan2.upper()
+        # reset
+        self.reset()
+        self.wait()
+        # configure channels and bias
+        self.SetOutputMode(chan1, 'volt')
+
+        self.SetOutputMode(chan2, 'curr')
+        self.SetCurrent(0, chan2)
+        # turn on
+        self.SetOutput(1, chan1)
+        self.SetOutput(1, chan2)
+        time.sleep(1)
+        # perform IV sweep
+        v1 = []
+        i1 = []
+        v2 = []
+        for v in v_arr:
+            self.SetVoltage(v, chan1)
+            v1.append(self.GetVoltage(chan1))
+            v2.append(self.GetVoltage(chan2))
+            i1.append(self.GetCurrent(chan1))
+
+        # turn off
+        self.SetOutput(0, chan1)
+        self.SetOutput(0, chan2)
+
+        if visualize:
+            fig, ax1 = plt.subplots()
+            ax1.plot(i1, v1, label='CH1', color='blue')
+            ax1.set_ylabel('Voltage CH1 (V)', color='blue')
+            ax1.set_xlabel('Current CH1 (A)', color='blue')
+
+            ax2 = ax1.twinx()
+            ax2.plot(i1, v2, label='CH2', color='red')
+            ax2.set_ylabel('Voltage CH2 (V)', color='red')
+            ax2.set_xlabel('Current CH1 (A)', color='red')
+
+            ax2.set_xlim(ax1.get_xlim())
+            ax2.set_ylim(ax1.get_ylim())
+            
+            ax1.set_title(f'sweep_2CH_VV. CH1= {chan1} - CH2 = {chan2}')
+            fig.show()
+        return v1, i1, v2
+
+    def sweep_2CH_IV(self, chan1='A', chan2='B', curr_start=0, curr_stop=10e-6, curr_num=10, visualize=True):
+        """Set a current on CH1 and read curr and voltage on CH1, voltage on CH2."""
+        import numpy as np
+        import time
+        import matplotlib.pyplot as plt
+        i_arr = np.linspace(curr_start, curr_stop, curr_num)
+        chan1 = chan1.upper()
+        chan2 = chan2.upper()
+        # reset
+        self.reset()
+        self.wait()
+        # configure channels and bias
+        self.SetOutputMode(chan2, 'curr')
+
+        self.SetOutputMode(chan1, 'curr')
+        self.SetCurrent(0, chan2)
+        # turn on
+        self.SetOutput(1, chan1)
+        self.SetOutput(1, chan2)
+        time.sleep(1)
+        # perform IV sweep
+        v1 = []
+        i1 = []
+        v2 = []
+        for i in i_arr:
+            self.SetCurrent(i, chan1)
+            v1.append(self.GetVoltage(chan1))
+            v2.append(self.GetVoltage(chan2))
+            i1.append(self.GetCurrent(chan1))
+
+        # turn off
+        self.SetOutput(0, chan1)
+        self.SetOutput(0, chan2)
+
+        if visualize:
+            fig, ax1 = plt.subplots()
+            ax1.plot(i1, v1, label='CH1', color='blue')
+            ax1.set_ylabel('Voltage CH1 (V)', color='blue')
+            ax1.set_xlabel('Current CH1 (A)', color='blue')
+
+            ax2 = ax1.twinx()
+            ax2.plot(i1, v2, label='CH2', color='red')
+            ax2.set_ylabel('Voltage CH2 (V)', color='red')
+            ax2.set_xlabel('Current CH1 (A)', color='red')
+
+            ax2.set_xlim(ax1.get_xlim())
+            ax2.set_ylim(ax1.get_ylim())
+            
+            ax1.set_title(f'sweep_2CH_IV. CH1= {chan1} - CH2 = {chan2}')
+            fig.show()
+        return v1, i1, v2
+    
+    def SweepVV_independent(self, ch1='A', ch2='B', v1_start=0, v1_stop=5, v2_bias=0, pts=100, visualize=True):
+        import numpy as np
+        import matplotlib.pyplot as plt
+        self.reset()
+        self.SetOutputMode(ch1, 'volt')
+        self.SetOutputMode(ch2, 'volt')
+    
+        v_arr = np.linspace(v1_start, v1_stop, pts)
+        self.SetVoltage(0, ch1)
+        self.SetVoltage(v2_bias, ch2)
+    
+        i1 = []
+        v1 = []
+        i2 = []
+        v2 = []
+    
+        self.SetOutput(1, ch1)
+        self.SetOutput(1, ch2)
+    
+        for v in v_arr:
+            self.SetVoltage(v, ch1)
+            v1.append(self.GetVoltage(ch1))
+            i1.append(self.GetCurrent(ch1))
+            v2.append(self.GetVoltage(ch2))
+            i2.append(self.GetCurrent(ch2))
+    
+        # turn off
+        self.SetOutput(0, ch1)
+        self.SetOutput(0, ch2)
+    
+        if visualize:
+            fig1, ax1 = plt.subplots()
+            ax1.plot(v1, i1, label='CH1 (PS)', color='blue')
+            ax1.set_xlabel('Voltage CH1 (V)', color='blue')
+            ax1.set_ylabel('Current CH1 (A)', color='blue')
+            ax1.set_title(f'sweep_2CH_independent. CH1')
+            fig1.show()
+    
+            fig2, ax2 = plt.subplots()
+            ax2.plot(v2, i2, label='CH2 (PD)', color='red')
+            ax2.set_xlabel('Voltage CH2 (V)', color='red')
+            ax2.set_ylabel('Current CH1 (A)', color='red')
+            ax1.set_title(f'sweep_2CH_independent. CH2')
+            fig2.show()
+        return v1, i1, v2, i2
+
+    def SweepVI_independent(self, ch1='A', ch2='B', v1_start=0, v1_stop=5, curr2=0, pts=100, visualize=True):
+        import numpy as np
+        import matplotlib.pyplot as plt
+        self.reset()
+        self.SetOutputMode(ch1, 'volt')
+        self.SetOutputMode(ch2, 'curr')
+    
+        v_arr = np.linspace(v1_start, v1_stop, pts)
+        self.SetVoltage(0, ch1)
+        self.SetCurrent(curr2, ch2)
+    
+        i1 = []
+        v1 = []
+        i2 = []
+        v2 = []
+    
+        self.SetOutput(1, ch1)
+        self.SetOutput(1, ch2)
+    
+        for v in v_arr:
+            self.SetVoltage(v, ch1)
+            v1.append(self.GetVoltage(ch1))
+            i1.append(self.GetCurrent(ch1))
+            v2.append(self.GetVoltage(ch2))
+            i2.append(self.GetCurrent(ch2))
+    
+        # turn off
+        self.SetOutput(0, ch1)
+        self.SetOutput(0, ch2)
+    
+        if visualize:
+            fig1, ax1 = plt.subplots()
+            ax1.plot(v1, i1, label='CH1', color='blue')
+            ax1.set_xlabel('Voltage CH1 (V)', color='blue')
+            ax1.set_ylabel('Current CH1 (A)', color='blue')
+            ax1.set_title(f'sweep_2CH_independent. CH1')
+            fig1.show()
+    
+            fig2, ax2 = plt.subplots()
+            ax2.plot(v2, i2, label='CH2', color='red')
+            ax2.set_xlabel('Voltage CH2 (V)', color='red')
+            ax2.set_ylabel('Current CH2 (A)', color='red')
+            ax1.set_title(f'sweep_2CH_independent. CH2')
+            fig2.show()
+
+        return v1, i1, v2, i2

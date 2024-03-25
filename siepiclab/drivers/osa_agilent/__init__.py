@@ -28,11 +28,28 @@ class osa_agilent(instruments.instr_VISA):
     def reset(self):
         self.query("*rst;*opc?")
 
-    def SingleSweep(self): # does a single sweep
-        self.write('INIT:imm')
+
+    def SingleSweep(self, timeout_safety=6):
+        """
+        does a single sweep
+        timeout_safety corresponds to 
+        """
+        import time
+        self.write('syst:comm:gpib:buff on')
+        self.write('sens:swe:time:auto on')
+        timeout = self.GetSweepTime()+timeout_safety
+        # Runs the Sweep:
+        self.addr.write('init:imm')
+        # Ensures no other GPIB Commands are run until the previous commands are finished.
+        self.addr.write('wai')
+        time.sleep(timeout)
+
+
+    def GetSweepTime(self):
+        return float(self.addr.query('SENS:SWE:TIME?').strip())
 
     def SweepMode(self, single=True):
-        return self.query('INIT:CONT?')
+        return self.addr.query('INIT:CONT?')
         
 
     def SetSweepMode(self, single=True):
@@ -48,10 +65,30 @@ class osa_agilent(instruments.instr_VISA):
     def SetStartWavelength(self, wavl):
         self.write(f"sens:wav:star {wavl}nm")
 
+
+    def SetSensitivity(self, sens):
+        """input in dBm"""
+        self.write(f'sens:pow:DC:RANG:LOW {sens}dbm')
+        pass
+
+    def SetReference(self, lvl):
+        self.write(f"DISP:WIND:TRAC:Y:SCAL:RLEV {lvl}dbm")
+        pass
+
+    def SetResolution(self, res=None):
+        if res == None:
+            self.write('sens:band:res:AUTO ON')
+        else:
+            self.write('sens:band:res:AUTO OFF')
+            self.write(f'sens:band:res {res}nm')
+
+
     def WavlCenter(self):
         return float(self.query("sens:wav:cent?"))
 
     def SetWavlCenter(self, wavl):
+        """units in nm."""
+
         self.write(f"sens:wav:cent {wavl}nm")
 
     def WavlSpan(self):
@@ -70,16 +107,16 @@ class osa_agilent(instruments.instr_VISA):
     """
 
     def getTraceRange(self):
-        start = float(self.query("trac:x:star? tra"))
-        stop =  float(self.query("trac:x:stop? tra"))
+        start = float(self.addr.query("trac:x:star? tra"))
+        stop =  float(self.addr.query("trac:x:stop? tra"))
         return [start, stop]
     
     def getTracePoints(self):
-        return int(self.query('trac:poin? tra'))
+        return int(self.addr.query('trac:poin? tra'))
 
     def getPower(self):
-        self.write('form: ascii')
-        pwr_ascii = self.query('trac:data:y? tra').split(',')
+        #self.write('form: ascii')
+        pwr_ascii = self.addr.query('trac:data:y? tra').split(',')
         pwr = np.array(pwr_ascii, dtype=np.float32)
         return pwr
 
