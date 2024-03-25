@@ -53,11 +53,23 @@ sequence.numPts = 10 + 1
 sequence.temperature = 25 # Degrees C
 
 
+
  # Power Monitor Settings:
-sequence.pm.SetWavl(1550)
-sequence.pm.SetPwrUnit('mW')
-sequence.pm.SetAutoRanging(1)
-sequence.pm.SetPwrRange(0)
+
+sequence.pm.SetWavl(1270)
+
+ 
+chipID = 'DPLAB_Test_MACOM1270'
+date = datetime.now().strftime("%y-%m-%d_")
+basedir = 'C:\\!Data'
+#basedir = '/Volumes/Shared/QMI/CartSoftware/SiEPICLab/siepiclab/'
+datadir = basedir + date + chipID
+
+#sequence.pm.SetWavl(1550)
+#sequence.pm.SetPwrUnit('mW')
+#sequence.pm.SetAutoRanging(1)
+#sequence.pm.SetPwrRange(0)
+
 
 
  

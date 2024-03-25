@@ -28,6 +28,7 @@ class osa_agilent(instruments.instr_VISA):
     def reset(self):
         self.query("*rst;*opc?")
 
+
     def SingleSweep(self, timeout_safety=6):
         """
         does a single sweep
@@ -64,6 +65,7 @@ class osa_agilent(instruments.instr_VISA):
     def SetStartWavelength(self, wavl):
         self.write(f"sens:wav:star {wavl}nm")
 
+
     def SetSensitivity(self, sens):
         """input in dBm"""
         self.write(f'sens:pow:DC:RANG:LOW {sens}dbm')
@@ -80,11 +82,13 @@ class osa_agilent(instruments.instr_VISA):
             self.write('sens:band:res:AUTO OFF')
             self.write(f'sens:band:res {res}nm')
 
+
     def WavlCenter(self):
         return float(self.query("sens:wav:cent?"))
 
     def SetWavlCenter(self, wavl):
         """units in nm."""
+
         self.write(f"sens:wav:cent {wavl}nm")
 
     def WavlSpan(self):

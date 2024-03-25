@@ -40,6 +40,7 @@ Polarization Optimization:
 
 
 Davin Birdi and Josh Gibbs, 2024
+
 @With Templates and support from Mustafa Hammood, SiEPIC Kits, 2022
 @Based on original work by Hossam Shossam
 """
@@ -48,7 +49,9 @@ import pandas as pd
 import numpy as np
 import pyvisa as visa
 import matplotlib.pyplot as plt
+
 from time import sleep
+
 
 from datetime import datetime
 from siepiclab.sequences.SetupLDC501 import SetupLDC501
@@ -56,6 +59,8 @@ from siepiclab.drivers.ldc_srs_ldc500 import ldc_srs_ldc500
 from siepiclab.drivers.osa_agilent import osa_agilent
 from siepiclab.drivers.PowerMonitor_keysight import PowerMonitor_keysight
 rm = visa.ResourceManager()
+
+
 
 if True:
     osa_gpib = 'GPIB0::1::INSTR'
@@ -73,62 +78,124 @@ ldc = ldc_srs_ldc500(rm.open_resource(ldc_gpib), chan='')
 print(osa.identify())
 print(ldc.identify())
 
-# %%
-ldc.GetTemperature()
-ldc.SetTemperature(25)
-ldc.tecON()
-ldc.LDON()
-ldc.SetLDcurrent(2)
 
-#osa.SetWavlCenter(1550)
-#osa.SetWavlSpan(10)
-temperatures = 25#np.array([20, 25, 30, 35, 40, 45])
-biases = np.array([50, 100, 150])
-wavl = []
-pwr = []
-data = pd.DataFrame()
+if True:
+  # %%
+  def simple_test():
+      ldc.LDON()
+      ldc.SetLDcurrent(20)
 
-print('Starting LDC Sweeps...')
-for bias in biases:
-    try:
-        print(f'Setting Current to {bias}mA...')
-        ldc.SetLDcurrent(bias)
-        sleep(10)
-        osa.SingleSweep()
-        sleep(220)
-        wavl, pwr = osa.getTrace()
-        plt.plot(wavl, pwr)
-        data[f'{bias:0.2f}'] = pwr
-    except:
-        input('Failed to connect to instrument, reconnecting...')
+      osa.SingleSweep()
 
-# ldc.SetLDcurrent(50)
-# for temperature in temperatures:
-#     try:
-#         ldc.SetTemperature(temperature)
-#         sleep(60)
-#         osa.SingleSweep()
-#         sleep(6)
-#         wavl, pwr = osa.getTrace()
-#         plt.plot(wavl, pwr)
-#         data[f'{temperature:0.2f}'] = pwr
-#     except:
-#         input('Failed to connect to instrument, reconnecting...')
+      osa.SetWavlCenter(1270)
+      print(osa.WavlCenter())
+
+      osa.SetWavlSpan(1)
+      print(osa.WavlSpan())
+
+      numpts = osa.getTracePoints()
+      print(numpts)
+      osa.SingleSweep()
+      wavl, pwr = osa.getTrace()
+      plt.plot(wavl, pwr)
+
+      # Notice the plot plots before results are shown.
+
+  simple_test()
+  # %% LDC Current Bias Scan
+  ldc.GetTemperature()
+  ldc.SetTemperature(25)
+  ldc.tecON()
 
 
 
+  biases = np.array([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
 
-data['wavl'] = wavl
-data = data.set_index('wavl')
+  wavl = []
+  pwr = []
+
+  data = pd.DataFrame()
+
+  osa.SetWavlSpan(1)
+
+  ldc.LDON()
+  ldc.SetLDcurrent(0)
+
+
+  for bias in biases:
+
+      # Biases the Laser
+      ldc.SetLDcurrent(bias)
+
+      # Does a sweep
+      osa.SingleSweep()
+
+      # Gets the trace data
+      wl, p = osa.getTrace()
+
+      # Adds Power Data
+      data[f'{bias:0.2f}'] = p
+
+  # Get the Wavelength Once
+  data['wavl'] = wl
+  date = data.set_index('wavl')
+
+elif:
+    # %%
+    ldc.GetTemperature()
+    ldc.SetTemperature(25)
+    ldc.tecON()
+    ldc.LDON()
+    ldc.SetLDcurrent(2)
+
+    #osa.SetWavlCenter(1550)
+    #osa.SetWavlSpan(10)
+    temperatures = 25#np.array([20, 25, 30, 35, 40, 45])
+    biases = np.array([50, 100, 150])
+    wavl = []
+    pwr = []
+    data = pd.DataFrame()
+
+    print('Starting LDC Sweeps...')
+    for bias in biases:
+        try:
+            print(f'Setting Current to {bias}mA...')
+            ldc.SetLDcurrent(bias)
+            sleep(10)
+            osa.SingleSweep()
+            sleep(220)
+            wavl, pwr = osa.getTrace()
+            plt.plot(wavl, pwr)
+            data[f'{bias:0.2f}'] = pwr
+        except:
+            input('Failed to connect to instrument, reconnecting...')
+
+    # ldc.SetLDcurrent(50)
+    # for temperature in temperatures:
+    #     try:
+    #         ldc.SetTemperature(temperature)
+    #         sleep(60)
+    #         osa.SingleSweep()
+    #         sleep(6)
+    #         wavl, pwr = osa.getTrace()
+    #         plt.plot(wavl, pwr)
+    #         data[f'{temperature:0.2f}'] = pwr
+    #     except:
+    #         input('Failed to connect to instrument, reconnecting...')
+
+    data['wavl'] = wavl
+    data = data.set_index('wavl')
+
 
 ## Turn off.
 ldc.SetLDcurrent(0)
 ldc.LDOFF()
-#ldc.tecOFF()
+
+ldc.tecOFF()
 
 # %% Plot and Save to CSV
 
-plt.plot(data)
+
 
 
 chipID = 'NRC_FP_Laser_Si_Submount'
@@ -144,6 +211,5 @@ data.to_csv(savename +".csv")
 
 
 plt.show()
-
 
 # %%
