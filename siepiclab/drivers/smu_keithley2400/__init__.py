@@ -381,3 +381,31 @@ class smu_keithley2400(instruments.instr_VISA):
             self.SetResistanceMode(chan)
             res = float(self.addr.query("READ?"))
             return res
+
+
+
+
+
+    def GetBeeperState(self):
+        return self.addr.query(':SYST:BEEP:STATE?')
+    
+    def SetBeeperState(self, state):
+        if state == True:
+            self.addr.write(':SYST:BEEP:STATE ON')
+        elif state == False:
+            self.addr.write(':SYST:BEEP:STATE OFF')
+
+
+    def GetBeeperSettings(self):
+        # Cannot find from documentation.
+        pass
+
+    def SetBepperSettings(self, freq, time):
+        """
+        freq [65, 2e6]
+        time [0, 7.9]
+        
+        Doesn't control the Error Beeps
+        """
+
+        self.addr.write(f':SYST:BEEP:IMM {freq},{time}')
