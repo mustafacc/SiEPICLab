@@ -1,7 +1,7 @@
 """
 SiEPIClab sequence application example.
 
-Sequence to perform swept wavelength measurement using tunable laser and monitor.
+Sequence to perform swept wavelength measurement using compact tunable laser (81689A) and monitor.
 Test setup:
     laser -SMF-> ||DUT|| -SMF-> Power Monitor(s)
 
@@ -16,21 +16,27 @@ from siepiclab.drivers.lwmm_keysight import lwmm_keysight
 rm = visa.ResourceManager()
 
 # %% instruments definition
-mf = lwmm_keysight(rm.open_resource('mainframe_1550'))  # mainframe
-tls = tls_keysight(rm.open_resource('mainframe_1550'), chan='0')
-pm1 = PowerMonitor_keysight(rm.open_resource('mainframe_1550'), chan='1', slot='1')
-pm2 = PowerMonitor_keysight(rm.open_resource('mainframe_1550'), chan='1', slot='2')
+mainframe_1550 = 'GPIB0::19::INSTR'
+mf = lwmm_keysight(rm.open_resource(mainframe_1550))  # mainframe
+tls = tls_keysight(rm.open_resource(mainframe_1550), chan='0')
+pm1 = PowerMonitor_keysight(rm.open_resource(mainframe_1550), chan='1', slot='2')
+
 # %% sequence definition
-sequence = SweepWavelengthSpectrum(mf, tls, [pm1, pm2])
-sequence.wavl_start = 1285  # nm
-sequence.wavl_stop = 1375  # nm
-sequence.wavl_pts = 401  # number of points
+sequence = SweepWavelengthSpectrum(mf, tls, [pm1])
+sequence.wavl_start = 1524  # nm
+sequence.wavl_stop = 1575  # nm
+sequence.wavl_pts = 101  # number of points
 sequence.pwr = 1  # mW
-sequence.sweep_speed = 20  # nm/s
+sequence.sweep_speed = 1  # nm/s
 sequence.upper_limit = 0  # maximum power expected (dbm, -100: existing setting.)
 sequence.verbose = True  # turn on verbose logging mode
 sequence.visual = True  # visualize the wavelength sweep results
+sequence.saveplot = True
+sequence.mode = 'step'  # use stepped mode instead of continuous
+
+file_name = '2022-08-23_test3'
+sequence.file_name = file_name
 
 sequence.execute()
-
-sequence.results.save()
+sequence.results.save(file_name)
+pass

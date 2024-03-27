@@ -93,15 +93,29 @@ class SweepPolarization(measurements.sequence):
         pmReadOut = 10*np.log10(pmReadOut)
         pmReadOut = pmReadOut[np.logical_not(np.isnan(pmReadOut))]  # remove nan
 
+        if pmReadOut.size == 0:
+            raise ValueError('pmReadOut is all NaN, meaning invalid readings. Verify optical path and try again.')
+            
+
         # TODO: change this to optimize for an input fom and not just T
         if self.optimize:
             if self.verbose:
                 print("Optimizing polarizaition . . .")
             maxT = np.max(pmReadOut)  # maximum transmission
+            minT = np.min(pmReadOut)
             idx = np.where(pmReadOut == maxT)[0]
+            
+            try: # instances where two values of idx arise, such as in a peak of a sine wave.
+                if idx.size > 1:
+                    idx = idx[0]
+            except:
+                pass
+            
             self.polCtrl.SetPaddlePositionAll(samples[idx[0]])
+            self.results.add('idx', idx)
+            self.results.add('maxT', maxT)
+            self.results.add('minT', minT)
 
-        self.results.add('idx', idx)
         self.results.add('pmReadOut', pmReadOut)
 
         if self.visual:
@@ -112,11 +126,21 @@ class SweepPolarization(measurements.sequence):
                 plt.plot(idx, 10*np.log10(self.pm.GetPwr()), 'x')
             plt.xlabel('Sample')
             plt.ylabel('Power [dBm]')
-            title1 = 'Polarization optimization sweep sequence\n'
+            title1 = str(self.file_name) + 'Polarization optimization sweep sequence\n'
             title2 = f'scanrate = {self.scanrate}, pwr = {10*np.log10(self.pwr)} dBm\n'
             title3 = f'wavl = {int(self.wavl)} nm, scantime = {self.scantime}'
 
             plt.title(title1+title2+title3)
             plt.tight_layout()
+
+            if self.saveplot:
+                # Create Directory specified by self.file_name if it DNE
+                self.results.createDir(self.file_name)
+
+                plt.gcf()
+                plt.savefig(self.file_name + '.png', format='png')
+
+
         if self.verbose:
             print("\n***Sequence executed successfully.***")
+

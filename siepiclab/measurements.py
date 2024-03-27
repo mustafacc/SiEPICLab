@@ -6,6 +6,7 @@ Mustafa Hammood, SiEPIC Kits, 2022
 """
 import pickle
 from datetime import datetime
+import pathlib
 
 
 class routine:
@@ -158,9 +159,40 @@ class results:
                 file_name = str(datetime.now().strftime('%Y%m%d%H%M%S'))
             else:
                 file_name = str(datetime.now().strftime('%Y%m%d%H%M%S'))+'_'+file_name
-
+        
         with open(str(file_name)+'.pkl', 'wb') as f:
             pickle.dump(self.data, f)
+
+    def createDir(self, file_name):
+        """ 
+        Make a Directory in the location in the string set before the last forward slash
+        if it does not already exist. If it already exists, it does nothing.
+        
+        Example:
+        --------
+            file_name = basedir + '/' + date + exprmt_name + '/' + date + chipname
+                >> 'TestData/2022-09-20_FileSystemValidation/2022-09-20_NoChip'
+            
+            seq.results.createDir(file_name)
+                >> (none)
+
+        Parameters:
+        ----------
+        file_name: string
+            File name and directory of the file to save.
+
+        Returns:
+        -------
+        None
+        """
+        idx = str(file_name).rfind('/')
+        if idx < 0:
+            dir = file_name
+        else:
+            dir = file_name[:idx]
+        
+        # Creates directory if it does not exist
+        pathlib.Path(dir).mkdir(parents=True, exist_ok=True) 
 
     def load(self, file_name):
         """
@@ -190,6 +222,8 @@ class sequence:
         self.saveplot = saveplot
         self.results = results()
         self.instruments = []
+        self.file_name = ''
+        self.reset_after_execution = True
         return
 
     def execute(self):
@@ -206,4 +240,26 @@ class sequence:
         self.instructions()
 
         # reset the experiment state to the initial state
-        self.experiment.SetSettings(settings)
+        if self.reset_after_execution:
+            self.experiment.SetSettings(settings)
+
+
+    """
+    Attributes:
+    -----------
+        file_name : string
+            File name and directory of the file to save. When you update the filename it
+            automatically creates the folder
+
+    """
+    @property
+    def file_name(self):
+        return self._file_name
+
+    @file_name.setter
+    def file_name(self, file_name):
+        self._file_name = file_name
+        self.results.createDir(file_name)
+
+
+    

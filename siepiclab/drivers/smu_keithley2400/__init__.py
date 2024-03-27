@@ -21,12 +21,12 @@ class smu_keithley2400(instruments.instr_VISA):
         """Return an instance of the instrument."""
         currState = instruments.state()
         currState.AddState('output_a', self.GetOutput('A'))
-        currState.AddState('volt_a', self.GetVoltage('A'))
-        currState.AddState('curr_a', self.GetCurrent('A'))
-        currState.AddState('curr_lim_a', self.GetCurrentLimit('A'))
-        currState.AddState('volt_lim_a', self.GetVoltageLimit('A'))
-        currState.AddState('res_a', self.GetResistance('A'))
-
+        currState.AddState('auto_ohm_mode', self.GetAutoOhmMode())
+        #currState.AddState('volt_a', self.GetVoltage('A'))
+        #currState.AddState('curr_a', self.GetCurrent('A'))
+        #currState.AddState('curr_lim_a', self.GetCurrentLimit('A'))
+        #currState.AddState('volt_lim_a', self.GetVoltageLimit('A'))
+        #currState.AddState('res_a', self.GetResistance('A'))
         return currState
 
     def SetState(self, state):
@@ -44,10 +44,11 @@ class smu_keithley2400(instruments.instr_VISA):
 
         """
         self.SetOutput(state['output_a'], 'A', verbose=True)
-        self.SetVoltage(state['volt_a'], 'A', verbose=True)
-        self.SetCurrent(state['curr_a'], 'A', verbose=True)
-        self.SetCurrentLimit(state['curr_lim_a'], 'A', verbose=True)
-        self.SetVoltageLimit(state['volt_lim_a'], 'A', verbose=True)
+        self.SetAutoOhmMode(state['auto_ohm_mode'])
+        #self.SetVoltage(state['volt_a'], 'A', verbose=True)
+        #self.SetCurrent(state['curr_a'], 'A', verbose=True)
+        #self.SetCurrentLimit(state['curr_lim_a'], 'A', verbose=True)
+        #self.SetVoltageLimit(state['volt_lim_a'], 'A', verbose=True)
 
     def reset(self, verbose=False):
         """
@@ -59,9 +60,26 @@ class smu_keithley2400(instruments.instr_VISA):
         self.addr.write(":STAT:QUEUE:CLEAR")
         self.addr.write("*RST")
         self.addr.write(":STAT:PRES")
-        self.addr.write(":*CLS")
+        self.addr.write(":SYST:PRES")
+        self.addr.write(":*CLS; *WAI")
+
+        # Disable Auto-Ohm Mode if on. (Prevents GetState)
+        self.SetAutoOhmMode(False)
+        self.SetOutput(False)
+
         if verbose:
             print('Reseting the Keithley Source Measure Unit instrument. . .')
+
+
+    def SetAutoOhmMode(self, state, chan='A', verbose=False, wait=False):
+        if state == True:
+            self.addr.write(":RES:MODE AUTO")
+        else:
+            self.addr.write(":RES:MODE MAN")
+
+    def GetAutoOhmMode(self):
+        status = self.addr.query(':res:mode?')
+        return status
 
     def SetVoltageMode(self, chan='A', verbose=False, wait=False):
         """
@@ -165,6 +183,13 @@ class smu_keithley2400(instruments.instr_VISA):
         None.
 
         """
+        if status == True:
+            status = 1
+        elif status == False:
+            status = 0
+        else:
+            raise ValueError('Incorrect Input type, rtfm')
+
         if chan == 'A':
             self.addr.write(f":OUTP1 {status}")
             if wait or verbose:
@@ -188,7 +213,7 @@ class smu_keithley2400(instruments.instr_VISA):
 
         """
         if chan == 'A':
-            self.SetVoltageMode(chan)
+            #self.SetVoltageMode(chan)
             volt = float(self.addr.query("READ?"))
             return volt
 
@@ -236,7 +261,7 @@ class smu_keithley2400(instruments.instr_VISA):
 
         """
         if chan == 'A':
-            self.SetVoltageMode(chan)
+            # self.SetVoltageMode(chan)
             curr = float(self.addr.query("READ?"))
             return curr
 
@@ -381,3 +406,52 @@ class smu_keithley2400(instruments.instr_VISA):
             self.SetResistanceMode(chan)
             res = float(self.addr.query("READ?"))
             return res
+
+
+
+
+    def GetBeeperState(self):
+        return self.addr.query(':SYST:BEEP:STATE?')
+    
+    def SetBeeperState(self, state):
+        if state == True:
+            self.addr.write(':SYST:BEEP:STATE ON')
+        elif state == False:
+            self.addr.write(':SYST:BEEP:STATE OFF')
+
+
+    def GetBeeperSettings(self):
+        # Cannot find from documentation.
+        pass
+
+    def SetBepperSettings(self, freq, time):
+        """
+        freq [65, 2e6]
+        time [0, 7.9]
+        
+        Doesn't control the Error Beeps
+        """
+
+        self.addr.write(f':SYST:BEEP:IMM {freq},{time}')
+
+
+    def GetConcurrentMode(self):
+        return (self.addr.query(':FUNC:CONC?'))
+    
+    def SetConcurrentMode(self, state):
+        """
+        Manual:
+        When concurrent measurements are enabled, these commands are used
+        to enable or disable functions to be measured. The [:ON] command is
+        used to include (enable) one or more measurement functions in the list,
+        and the :OFF command is used to remove (disable) one or more func-
+        tions from the list.
+        """
+        if state == True:
+            self.addr.write(':FUNC:CONC ON')
+            self.addr.write(':FUNCtion "VOLTage", "CURRent", "RESistance"')
+        elif state == False:
+            self.addr.write(':FUNC:CONC OFF')
+
+
+
